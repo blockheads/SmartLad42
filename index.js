@@ -8,6 +8,7 @@ const fs = require('fs');
 
 //bot token shh
 const token = 'MzAwMDI1NjMwNzE0NDk0OTc2.C8mt1w.n17F0ZiVIWLQ21t1dgemob2AqJ0';
+const token2 = '246421186777448460';
 bot.login();
 
 //initializes the bot to logon
@@ -57,7 +58,7 @@ bot.on('presenceUpdate',Presence=>{
 //singularly play audio on end of audio stream leave channel (defaults to swamp)
 function playAudioInSwamp(song,volume){
     
-        voiceChannel = bot.channels.get("246421186777448460");
+        voiceChannel = bot.channels.get(token2);
         if (!voiceChannel) {
             console.log("null VoiceChannel")
         }
@@ -156,7 +157,7 @@ function getSong(message){
             
          
             var song = songArray[randomIndex];
-            var volume = parseInt( songArray[randomIndex +1]) + 1;
+            var volume = parseInt( songArray[randomIndex +1]);
             console.log(song + " selected");
 
             return [song,volume];
