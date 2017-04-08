@@ -7,8 +7,8 @@ const yt = require('ytdl-core');
 const fs = require('fs');
 
 //bot token shh
-const token = 'MzAwMDI1NjMwNzE0NDk0OTc2.C8mt1w.n17F0ZiVIWLQ21t1dgemob2AqJ0';
-const token2 = '246421186777448460';
+const token = '';
+const token2 = '';
 bot.login();
 
 //initializes the bot to logon
@@ -22,6 +22,8 @@ var dispatcher = null;
 var radioChannel = null;
 //variable to make sure the radio stream ends
 var streaming = false;
+
+var fuckMatt = false;
 
 var words = ["Blood Money","Benji","Funny Money","Yard ","Pots of Money",
              "Brass","Scrilla","Scrappa","Dibs","Handbag","Measures",
@@ -169,6 +171,10 @@ function getSong(message){
 
 //event listener for any messages
 bot.on('message',message=>{
+    if(fuckMatt && message.author.id==='193186571615207424'){
+        message.delete();
+        message.reply("fuck you matt");
+    }
     if(message.content === 'what is my avatar'){
         //reply with users avatar
         message.reply(message.author.avatarURL);
@@ -227,6 +233,9 @@ bot.on('message',message=>{
             radioChannel.leave();
             
         }
+    }
+    if(message.content === 'fuck matt'){
+        fuckMatt=!fuckMatt;
     }
    
 
