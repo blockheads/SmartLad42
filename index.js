@@ -7,8 +7,8 @@ const yt = require('ytdl-core');
 const fs = require('fs');
 
 //bot token shh
-const token = 'MzAwMDI1NjMwNzE0NDk0OTc2.C8mt1w.n17F0ZiVIWLQ21t1dgemob2AqJ0';
-const token2 = '246421186777448460';
+const token = '';
+const token2 = '';
 bot.login();
 
 //initializes the bot to logon
@@ -22,8 +22,12 @@ var dispatcher = null;
 var radioChannel = null;
 //variable to make sure the radio stream ends
 var streaming = false;
-
+var VoiceChannel = null;
 var fuckMatt = false;
+
+var screams = ["https://youtu.be/CKUDgLYfzAw","https://youtu.be/-p1OGgPkLcw",
+                "https://youtu.be/8w0SpnL_Ysg","https://youtu.be/bSK0wmREv5g",
+                "https://youtu.be/AsAAybD5iKU","https://youtu.be/Rq2vdkfjaMg"]
 
 var words = ["Blood Money","Benji","Funny Money","Yard ","Pots of Money",
              "Brass","Scrilla","Scrappa","Dibs","Handbag","Measures",
@@ -64,7 +68,6 @@ bot.on('presenceUpdate',Presence=>{
 
 //singularly play audio on end of audio stream leave channel (defaults to swamp)
 function playAudioInSwamp(song,volume){
-    
         voiceChannel = bot.channels.get(token2);
         if (!voiceChannel) {
             console.log("null VoiceChannel")
@@ -75,8 +78,8 @@ function playAudioInSwamp(song,volume){
             dispatcher = connnection.playStream(stream);
             dispatcher.setVolume(volume);
             dispatcher.on('end', () => {
-                voiceChannel.leave();
-                
+                streaming = false;
+                VoiceChannel.leave();
             });
         });
 }
@@ -101,25 +104,28 @@ function playAudio(message){
 }
 
 //continually stream audio 
-function audioStream(message){
-        const voiceChannel = message.member.voiceChannel;
-        if (!voiceChannel) {
-            console.log("null VoiceChannel")
-        }
-        voiceChannel.join()
-            .then(connnection => {
+function audioStream(message,connnection){
+        
             songData = getSong(message);
             let stream = yt(songData[0], {audioonly: true});
             dispatcher = connnection.playStream(stream);
             dispatcher.setVolume(songData[1]);
             dispatcher.on('end', () => {
                 //recursive call to start again
-                if(streaming){
-                    audioStream(message);
+                dispatcher = null;
+                if(streaming ){
+                    audioStream(message,connnection);
+                    if(!streaming){
+                        voiceChannel.leave();
+                        connnection.disconnect();
+                        
+                    }
+        
                 }
-                
+               
+              
             });
-        });
+    
 }
 
 //plays a singular song given a message
@@ -195,6 +201,7 @@ bot.on('message',message=>{
         console.log(dispatcher);
         if(dispatcher != null){
             dispatcher.setVolumeDecibels(parseInt(message.content.substr(6,message.content.length)));
+            
         }
     }
     
@@ -215,27 +222,33 @@ bot.on('message',message=>{
         console.log("The file was saved!");
         }); 
     }
-    if(message.content === 'start radio'){
+    if(message.content === 'start radio' || message.content === 'skip'){
         if(streaming){
             message.reply("Stop trying to fuck the bot up dick weed");
         }
         else{
             message.reply("Starting up radio, type 'stop radio' to stop");
-         
-        
+            voiceChannel = message.member.voiceChannel;
+             voiceChannel.join()
+            .then(connnection => {
+                audioStream(message,connnection);
+                
+            });
+            
             //storing voicechannel
             radioChannel = message.member.voiceChannel;
             streaming = true;
-            audioStream(message);
+            
         }
         
 
     }
-    if(message.content === 'stop radio'){
+    if(message.content === 'stop radio' || message.content === 'stop screaming'){
         //if there is a radioChannel
         if(streaming){
             streaming = false;
             radioChannel.leave();
+            radioChannel = null;
             
         }
     }
@@ -244,6 +257,28 @@ bot.on('message',message=>{
     }
    if(message.content.includes('seig') || message.content.includes('SEIG')) {
       message.reply("HEIL");
+    }
+    if(message.content.includes('scream')){
+        if(radioChannel == null){
+            streaming = true;
+            radioChannel = message.member.voiceChannel;
+            playAudioInSwamp(screams[Math.floor(Math.random()*screams.length)],1000000);
+            
+        }
+     
+       
+    }
+    if(message.content === 'skip'){
+        if(streaming){
+            radioChannel.leave();
+            voiceChannel.leave();
+            voiceChannel.join()
+            .then(connnection => {
+                audioStream(message,connnection);
+            
+            });
+
+        }
     }
     if(message.content === 'leaderboard'){
         
