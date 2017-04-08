@@ -7,5 +7,10 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Dungler45",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^11.0.0",
+    "opusscript": "0.0.3",
+    "ytdl": "^0.5.1"
+  }
 }
