@@ -200,7 +200,10 @@ bot.on('message',message=>{
         console.log("set volume : " + message.content.substr(6,message.content.length));
         console.log(dispatcher);
         if(dispatcher != null){
-            dispatcher.setVolumeDecibels(parseInt(message.content.substr(6,message.content.length)));
+            //dispatcher.setVolumeDecibels(parseFloat(message.content.substr(6,message.content.length)));
+            //sets the volume to small because semi-large numbers are way too loud
+            var vol = parseFloat(message.content.substr(6,message.content.length)) / 10;
+            dispatcher.setVolume(vol);
             
         }
     }
