@@ -24,7 +24,7 @@ var radioChannel = null;
 var streaming = false;
 
 var fuckMatt = false;
-
+//words for 'sing me a song' to randomly pull from
 var words = ["Blood Money","Benji","Funny Money","Yard ","Pots of Money",
              "Brass","Scrilla","Scrappa","Dibs","Handbag","Measures",
              "Bag of Sand","roblox","911 is a inside job","smoke weed",
