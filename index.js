@@ -16,24 +16,12 @@ bot.on('ready', () =>{
 });
 
 var dispatcher = null;
+var voiceChannel = null;
 
-bot.on('presenceUpdate',Presence=>{
-    if( Presence.user !=null && Presence.user.presence != null && Presence.user.presence.game!= null && Presence.user.presence.game.name != null){
-        if(Presence.user.presence.game.name === 'osu!'){
-            
-            playAudioInSwamp("https://youtu.be/a8c5wmeOL9o",1);
-        }
-        if(Presence.user.presence.game.name === 'ROBLOX'){
-            playAudioInSwamp("https://youtu.be/V4jH0WeV67I",1000000000);
-        }
-    }
-    
-      
-});
     
 function playAudioInSwamp(song,volume){
     
-    const voiceChannel = bot.channels.get("246421186777448460");
+        voiceChannel = bot.channels.get("246421186777448460");
         if (!voiceChannel) {
             console.log("null VoiceChannel")
         }
@@ -44,12 +32,13 @@ function playAudioInSwamp(song,volume){
             dispatcher.setVolume(volume);
             dispatcher.on('end', () => {
                 voiceChannel.leave();
+                voiceChannel = null;
             });
         });
 }
 
 function playAudio(guildMember,song){
-    const voiceChannel = guildMember.voiceChannel;
+        voiceChannel = guildMember.voiceChannel;
         if (!voiceChannel) {
             console.log("null VoiceChannel")
         }
@@ -60,6 +49,7 @@ function playAudio(guildMember,song){
 
             dispatcher.on('end', () => {
                 voiceChannel.leave();
+                voiceChannel = null;
             });
         });
 }
@@ -82,6 +72,11 @@ bot.on('message',message=>{
         console.log(dispatcher);
         if(dispatcher != null){
             dispatcher.setVolume(parseInt(message.content.substr(6,message.content.length)));
+        }
+    }
+    if(message.content === 'stop'){
+        if(dispatcher != null){
+            dispatcher.leave();
         }
     }
     
