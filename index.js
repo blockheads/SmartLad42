@@ -180,7 +180,7 @@ bot.on('message',message=>{
         message.reply(message.author.avatarURL);
     }
     if(message.content.includes('hitler')){
-        message.reply("Sig Heil");
+        message.reply("Seig Heil");
     }
     if(message.content.substr(0,4) === 'play'){
         bot.user.setGame(message.content.substr(4,message.content.length));
@@ -237,6 +237,11 @@ bot.on('message',message=>{
     if(message.content === 'fuck matt'){
         fuckMatt=!fuckMatt;
     }
+   if(message.content.includes('seig' || 'SEIG'){
+      message.reply("HEIL");
+    }
+
+
 
 
 });
