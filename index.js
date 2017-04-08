@@ -31,10 +31,12 @@ var words = ["Blood Money","Benji","Funny Money","Yard ","Pots of Money",
              "matt is cia","the third temple is coming","Flag","Handful",
              "Mill","Sheckles","Ton","Stack","Brick","Dough","Bread",
              "Good Cash","C-Note","Feddie","Cod","Course Note","High Rollin",
-             "Yayo","Rack","kilo","mula","Fuck-Fuck","nigga","big weed","Big Watch"
-             ,"Big Booty","Shaboobalaboopy","Stiplificate","Apologin","Bling Bling"
-             ,"Mamajahambo","dinosaurs","movie movie movie","Captian Alexe","Herb",
-             "Buster","Flossy","Thizz","Bling Bling",];
+             "Yayo","Rack","kilo","mula","Fuck-Fuck","nigga","big weed",
+             "Big Watch","Big Booty","Shaboobalaboopy","Stiplificate",
+             "Apologin","Bling Bling","Mamajahambo","dinosaurs",
+             "movie movie movie","Captian Alexe","Herb","Buster",
+             "Flossy","Thizz","Bling Bling","Frankenstein Controls","CIA radio",
+             "Dianna Cowern"];
 
 //generates a string of random words
 function randomWords(size){
