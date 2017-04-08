@@ -59,7 +59,7 @@ bot.on('presenceUpdate',Presence=>{
 
 //singularly play audio on end of audio stream leave channel (defaults to swamp)
 function playAudioInSwamp(song,volume){
-
+    
         voiceChannel = bot.channels.get(token2);
         if (!voiceChannel) {
             console.log("null VoiceChannel")
@@ -71,7 +71,7 @@ function playAudioInSwamp(song,volume){
             dispatcher.setVolume(volume);
             dispatcher.on('end', () => {
                 voiceChannel.leave();
-
+                
             });
         });
 }
@@ -90,12 +90,12 @@ function playAudio(message){
             dispatcher.setVolume(songData[1]);
             dispatcher.on('end', () => {
                 voiceChannel.leave();
-
+              
             });
         });
 }
 
-//continually stream audio
+//continually stream audio 
 function audioStream(message){
         const voiceChannel = message.member.voiceChannel;
         if (!voiceChannel) {
@@ -112,34 +112,34 @@ function audioStream(message){
                 if(streaming){
                     audioStream(message);
                 }
-
+                
             });
         });
 }
 
 //plays a singular song given a message
 function getSong(message){
-    try {
-            var songs = fs.readFileSync('\songs.txt', 'utf8');
-            console.log("songlist: " + songs);
+    try {  
+            var songs = fs.readFileSync('\songs.txt', 'utf8');   
+            console.log("songlist: " + songs);    
             var songArray = songs.split("|");
             //makes sure to select a song, not the number of times played
-            //song at even indencis
+            //song at even indencis 
             do{
                 var randomIndex = Math.floor( Math.random()*(  songArray.length*1));
             }while(randomIndex%2 ==1)
 
             message.channel.sendMessage("Song #" + Math.floor(randomIndex/2) + " selected out of " + Math.floor(songArray.length/2) + " known songs.");
             message.channel.sendMessage("Song #" + Math.floor(randomIndex/2) + " has been selected " + songArray[randomIndex + 1] + " times.");
-
+            
             //modifying new song length
             //have to re-write whole file unfortunately (can't think of better way)
-
-
+           
+           
             var logger = fs.createWriteStream('\songs.txt', {
                 //flags: 'a' // 'a' means appending (old data will be preserved)
             })
-
+             
             for(var i = 0; i<songArray.length; i++){
                 //updating song selected num
                 if(i==randomIndex+1){
@@ -154,10 +154,10 @@ function getSong(message){
                 else{
                     logger.write(songArray[i]+ "|");
                 }
-
+                
             }
-
-
+            
+         
             var song = songArray[randomIndex];
             var volume = parseInt( songArray[randomIndex +1]);
             console.log(song + " selected");
@@ -192,10 +192,10 @@ bot.on('message',message=>{
             dispatcher.setVolumeDecibels(parseInt(message.content.substr(6,message.content.length)));
         }
     }
-
+    
     if (message.content.startsWith('sing me a song')) {
 
-
+        
         message.channel.sendMessage(randomWords(Math.floor( Math.random()*20)),{tts:true});
 
     }
@@ -208,7 +208,7 @@ bot.on('message',message=>{
 
 
         console.log("The file was saved!");
-        });
+        }); 
     }
     if(message.content === 'start radio'){
         if(streaming){
@@ -216,14 +216,14 @@ bot.on('message',message=>{
         }
         else{
             message.reply("Starting up radio, type 'stop radio' to stop");
-
-
+         
+        
             //storing voicechannel
             radioChannel = message.member.voiceChannel;
             streaming = true;
             audioStream(message);
         }
-
+        
 
     }
     if(message.content === 'stop radio'){
@@ -231,7 +231,7 @@ bot.on('message',message=>{
         if(streaming){
             streaming = false;
             radioChannel.leave();
-
+            
         }
     }
     if(message.content === 'fuck matt'){
@@ -240,7 +240,10 @@ bot.on('message',message=>{
    if(message.content.includes('seig' || 'SEIG'){
       message.reply("HEIL");
     }
-
+    if(message.content === 'leaderboard'){
+        
+    }
+   
 
 
 
