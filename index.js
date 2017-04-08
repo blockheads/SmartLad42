@@ -7,8 +7,8 @@ const yt = require('ytdl-core');
 const fs = require('fs');
 
 //bot token shh
-const token = '';
-const token2 = '';
+const token = 'MzAwMDI1NjMwNzE0NDk0OTc2.C8mt1w.n17F0ZiVIWLQ21t1dgemob2AqJ0';
+const token2 = '246421186777448460';
 bot.login();
 
 //initializes the bot to logon
@@ -242,7 +242,7 @@ bot.on('message',message=>{
     if(message.content === 'fuck matt'){
         fuckMatt=!fuckMatt;
     }
-   if(message.content.includes('seig' || 'SEIG'){
+   if(message.content.includes('seig') || message.content.includes('SEIG')) {
       message.reply("HEIL");
     }
     if(message.content === 'leaderboard'){
