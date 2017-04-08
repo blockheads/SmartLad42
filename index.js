@@ -15,6 +15,55 @@ bot.on('ready', () =>{
     console.log('Smart Boy 42 Online.');
 });
 
+var dispatcher = null;
+
+bot.on('presenceUpdate',Presence=>{
+    if( Presence.user !=null && Presence.user.presence != null && Presence.user.presence.game!= null && Presence.user.presence.game.name != null){
+        if(Presence.user.presence.game.name === 'osu!'){
+            
+            playAudioInSwamp("https://youtu.be/a8c5wmeOL9o",1);
+        }
+        if(Presence.user.presence.game.name === 'ROBLOX'){
+            playAudioInSwamp("https://youtu.be/V4jH0WeV67I",1000000000);
+        }
+    }
+    
+      
+});
+    
+function playAudioInSwamp(song,volume){
+    
+    const voiceChannel = bot.channels.get("246421186777448460");
+        if (!voiceChannel) {
+            console.log("null VoiceChannel")
+        }
+        voiceChannel.join()
+            .then(connnection => {
+            let stream = yt(song, {audioonly: true});
+            dispatcher = connnection.playStream(stream);
+            dispatcher.setVolume(volume);
+            dispatcher.on('end', () => {
+                voiceChannel.leave();
+            });
+        });
+}
+
+function playAudio(guildMember,song){
+    const voiceChannel = guildMember.voiceChannel;
+        if (!voiceChannel) {
+            console.log("null VoiceChannel")
+        }
+        voiceChannel.join()
+            .then(connnection => {
+            let stream = yt(song, {audioonly: true});
+            dispatcher = connnection.playStream(stream);
+
+            dispatcher.on('end', () => {
+                voiceChannel.leave();
+            });
+        });
+}
+
 
 //event listener for any messages
 bot.on('message',message=>{
@@ -28,32 +77,29 @@ bot.on('message',message=>{
     if(message.content.substr(0,4) === 'play'){
         bot.user.setGame(message.content.substr(4,message.content.length));
     }
+    if(message.content.substr(0,6) === 'volume'){
+        console.log("set volume : " + message.content.substr(6,message.content.length));
+        console.log(dispatcher);
+        if(dispatcher != null){
+            dispatcher.setVolume(parseInt(message.content.substr(6,message.content.length)));
+        }
+    }
+    
     if (message.content.startsWith('sing me a song')) {
         //random song selected
         
         try {  
             var songs = fs.readFileSync('\songs.txt', 'utf8');   
-            console.log(songs);    
+            console.log("songlist: " + songs);    
             var songArray = songs.split("|");
-            var song = songArray[0];
+            var song = songArray[Math.floor( Math.random()*(  songArray.length*1))];
             console.log(song + " selected");
+            playAudio(message.member,song);
 
         } catch(e) {
             console.log('Error:', e.stack);
         }
 
-        const voiceChannel = message.member.voiceChannel;
-        if (!voiceChannel) {
-            return message.reply(`Please be in a voice channel first!`);
-        }
-        voiceChannel.join()
-            .then(connnection => {
-            let stream = yt(song, {audioonly: true});
-            const dispatcher = connnection.playStream(stream);
-            dispatcher.on('end', () => {
-                voiceChannel.leave();
-            });
-        });
     }
     if(message.content.substr(0,5) === 'learn'){
         console.log("writing");
@@ -61,6 +107,7 @@ bot.on('message',message=>{
         if(err) {
             return console.log(err);
         }
+
 
         console.log("The file was saved!");
         }); 
