@@ -31,8 +31,8 @@ var screams = ["https://youtu.be/CKUDgLYfzAw","https://youtu.be/-p1OGgPkLcw",
 
 var words = ["Blood Money","Benji","Funny Money","Yard ","Pots of Money",
              "Brass","Scrilla","Scrappa","Dibs","Handbag","Measures",
-             "Bag of Sand","roblox","911 is a inside job","smoke weed",
-             "matt is cia","the third temple is coming","Flag","Handful",
+             "Bag of Sand","roblox","911 was an inside job","smoke weed",
+             "Matt is CIA","the third temple is coming","Flag","Handful",
              "Mill","Sheckles","Ton","Stack","Brick","Dough","Bread",
              "Good Cash","C-Note","Feddie","Cod","Course Note","High Rollin",
              "Yayo","Rack","kilo","mula","Fuck-Fuck","nigga","big weed",
@@ -56,7 +56,7 @@ bot.on('presenceUpdate',Presence=>{
     if( Presence.user !=null && Presence.user.presence != null && Presence.user.presence.game!= null && Presence.user.presence.game.name != null){
         if(Presence.user.presence.game.name === 'osu!'){
 
-            playAudioInSwamp("https://youtu.be/a8c5wmeOL9o",1);
+            playAudioInSwamp("https://youtu.be/a8c5wmeOL9o",10);
         }
         if(Presence.user.presence.game.name === 'ROBLOX'){
             playAudioInSwamp("https://youtu.be/V4jH0WeV67I",1000000000);
