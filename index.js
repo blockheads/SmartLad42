@@ -27,8 +27,8 @@ var fuckMatt = false;
 //words for 'sing me a song' to randomly pull from
 var words = ["Blood Money","Benji","Funny Money","Yard ","Pots of Money",
              "Brass","Scrilla","Scrappa","Dibs","Handbag","Measures",
-             "Bag of Sand","roblox","911 is a inside job","smoke weed",
-             "matt is cia","the third temple is coming","Flag","Handful",
+             "Bag of Sand","roblox","911 was an inside job","smoke weed",
+             "Matt is CIA","the third temple is coming","Flag","Handful",
              "Mill","Sheckles","Ton","Stack","Brick","Dough","Bread",
              "Good Cash","C-Note","Feddie","Cod","Course Note","High Rollin",
              "Yayo","Rack","kilo","mula","Fuck-Fuck","nigga","big weed",
