@@ -52,7 +52,7 @@ bot.on('presenceUpdate',Presence=>{
     if( Presence.user !=null && Presence.user.presence != null && Presence.user.presence.game!= null && Presence.user.presence.game.name != null){
         if(Presence.user.presence.game.name === 'osu!'){
 
-            playAudioInSwamp("https://youtu.be/a8c5wmeOL9o",1);
+            playAudioInSwamp("https://youtu.be/a8c5wmeOL9o",10);
         }
         if(Presence.user.presence.game.name === 'ROBLOX'){
             playAudioInSwamp("https://youtu.be/V4jH0WeV67I",1000000000);
