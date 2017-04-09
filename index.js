@@ -251,11 +251,8 @@ bot.on('message',message=>{
         playAudioInSwamp(screams[Math.floor(Math.random()*screams.length)],1000000);
     }
     if(message.content === 'skip'){
-        //to skip first we have to end the current audio stream
+        //to skip first we have to end the current dispatcher
         dispatcher.end();
-        //so you cant break it by spamming skip calls
-        //then lets resume the radio by starting a new connection
-        voiceChannel.join()
         
     }
     if(message.content === 'leaderboard'){
