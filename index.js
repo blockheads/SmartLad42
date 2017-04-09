@@ -8,8 +8,8 @@ const fs = require('fs');
 //sleep
 
 //bot token shh
-const token = '';
-const token2 = '';
+const token = 'MzAwMDI1NjMwNzE0NDk0OTc2.C8mt1w.n17F0ZiVIWLQ21t1dgemob2AqJ0';
+const token2 = '246421186777448460';
 
 //initializes the bot to logon
 bot.on('ready', () =>{
@@ -113,7 +113,7 @@ function audioStream(message,connection){
         dispatcher.on('end',()=>{
             //begins another audio stream with the connection if has a voicechannel
             //and a dispatcher
-            return audioStream(message,connection);
+            audioStream(message,connection);
         });
     }
 
