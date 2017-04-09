@@ -50,7 +50,7 @@ var words = ["Blood Money","Benji","Funny Money","Yard ","Pots of Money",
              "The","man","is","insane","he","thinks","he","is","me","but","he",
              "doesn't","look","like","me","or","talk","like","me","he","is",
              "a","duckman","rururururu","clown","heckin'","ratboy genius","mime",
-             "Zain"];
+             "Zain","Giga Nigga"];
 
 var scotsman = ["Mr.","pajama-wearin'","basket-face","slipper-wieldin'",
                 "clype-dreep-bachle","gether-uping-blate-maw","bleathering gomeril",
@@ -58,8 +58,11 @@ var scotsman = ["Mr.","pajama-wearin'","basket-face","slipper-wieldin'",
                 "soy-faced","shilpit","mim-moothed","snivelin'","worm-eyed",
                 "hotten-blaugh","vile","stoochie","cally-breek-tattie","bug fightin'",
                 "jellyfish jumpin'","back-fur lovin'","needle pullin'","ladybud lovin'",
-                "time slot losin'","april foolin'","time wastin'","frogpostin'","doglovin'",
-                "spear-chuckin'","acid-trippin'"];
+                "time slot losin'","april foolin'","time wastin'","frog-postin'","dog-lovin'",
+                "spear-chuckin'","acid-trippin'","no-good","pansy","lily-livered",
+                "yellow-bellied","weak-stomached","cowerin'","bot-codin'","matt-hatin'",
+                "dnd-cancellin'","time-knowin'","matt-bein'","glover-playin'","scream typin'",
+                "programmin'","calc-failin'","ninny","project-doin'","roblox-lovin'","facebook-postin'"];
 
 //compares the song array
 function songCompare(a,b){
@@ -75,7 +78,7 @@ function randomWords(data, size){
         returnstring+= data[Math.floor( Math.random()*data.length)] + " ";
     }
     returnstring+= data[Math.floor( Math.random()*data.length)];
-    return returnstring.toUpperCase();
+    return returnstring;
 }
 
 bot.on('presenceUpdate',Presence=>{
@@ -220,7 +223,7 @@ bot.on('message',message=>{
     //scotsman insults
     if(message.content.startsWith('scotsman'))
     {
-        message.channel.sendMessage(randomWords(scotsman, Math.floor( Math.random()*20)),{tts:true});
+        message.channel.sendMessage(randomWords(scotsman, Math.floor( Math.random()*20)).toUpperCase(),{tts:true});
     }
 
     if(message.content.substr(0,5) === 'learn'){
