@@ -39,7 +39,9 @@ var words = ["Blood Money","Benji","Funny Money","Yard ","Pots of Money",
              "Apologin","Bling Bling","Mamajahambo","dinosaurs",
              "movie movie movie","Captian Alexe","Herb","Buster",
              "Flossy","Thizz","Bling Bling","Frankenstein Controls","CIA radio",
-             "Dianna Cowern"];
+             "Dianna Cowern", "Flava Flav","What","Time","You know what time it is",
+             "Clock","Vanta Black","Red Oyster","Hottie","New York", "Hoopz",
+             "Goldie","Smiley","Cutie"];
 
 //generates a string of random words
 function randomWords(size){
@@ -82,7 +84,7 @@ function playAudioInSwamp(song,volume){
     });
 }
 
-//continually stream audio 
+//continually stream audio
 function audioStream(message,connection){
     //this can only be called while streaming
     if(streaming){
@@ -96,38 +98,38 @@ function audioStream(message,connection){
         //begins another audio stream with the connection if has a voicechannel
         //and a dispatcher
         audioStream(message,connection);
-        
+
         });
     }
-    
-    
+
+
 }
 
 //gets a song with a volume
 function getSong(message){
-    try {  
-            var songs = fs.readFileSync('\songs.txt', 'utf8');   
-            console.log("songlist: " + songs);    
+    try {
+            var songs = fs.readFileSync('\songs.txt', 'utf8');
+            console.log("songlist: " + songs);
             var songArray = songs.split("|");
             //makes sure to select a song, not the number of times played
-            //song at even indencis 
+            //song at even indencis
             do{
                 var randomIndex = Math.floor( Math.random()*(  songArray.length*1));
             }while(randomIndex%2 ==1)
 
-            
+
             message.channel.sendMessage("Song #" + Math.floor(randomIndex/2) + " selected out of " + Math.floor(songArray.length/2) + " known songs.");
             message.channel.sendMessage("Song #" + Math.floor(randomIndex/2) + " has been selected " + songArray[randomIndex + 1] + " times.");
-            
-            
+
+
             //modifying new song length
             //have to re-write whole file unfortunately (can't think of better way)
-           
-           
+
+
             var logger = fs.createWriteStream('\songs.txt', {
                 //flags: 'a' // 'a' means appending (old data will be preserved)
             })
-             
+
             for(var i = 0; i<songArray.length; i++){
                 //updating song selected num
                 if(i==randomIndex+1){
@@ -142,10 +144,10 @@ function getSong(message){
                 else{
                     logger.write(songArray[i]+ "|");
                 }
-                
+
             }
-            
-         
+
+
             var song = songArray[randomIndex];
             var volume = parseFloat( songArray[randomIndex +1])/10;
             console.log(song + " selected");
@@ -181,10 +183,10 @@ bot.on('message',message=>{
             //sets the volume to small because semi-large numbers are way too loud
             var vol = parseFloat(message.content.substr(6,message.content.length)) / 10;
             dispatcher.setVolume(vol);
-            
+
         }
     }
-    
+
     if (message.content.startsWith('God says...')) {
 
         message.channel.sendMessage(randomWords(Math.floor( Math.random()*20)),{tts:true});
@@ -199,7 +201,7 @@ bot.on('message',message=>{
 
 
         console.log("The file was saved!");
-        }); 
+        });
     }
     if(message.content === 'start radio'){
         //so you can't break the bot
@@ -222,7 +224,7 @@ bot.on('message',message=>{
                 audioStream(message,connection);
             });
         }
-        
+
 
     }
     if(message.content === 'stop radio' || message.content === 'stop screaming'){
@@ -234,10 +236,10 @@ bot.on('message',message=>{
             dispatcher.end();
         }
         if(voiceChannel){
-            voiceChannel.leave();   
+            voiceChannel.leave();
         }
         dispatcher = null;
-        voiceChannel = null;       
+        voiceChannel = null;
     }
     if(message.content === 'fuck matt'){
         fuckMatt=!fuckMatt;
@@ -246,19 +248,19 @@ bot.on('message',message=>{
       message.reply("HEIL");
     }
     if(message.content.includes('scream')){
-        
+
         dispatcher.end();
         playAudioInSwamp(screams[Math.floor(Math.random()*screams.length)],1000000);
     }
     if(message.content === 'skip'){
         //to skip first we have to end the current dispatcher
         dispatcher.end();
-        
+
     }
     if(message.content === 'leaderboard'){
-        
+
     }
-   
+
 
 
 
