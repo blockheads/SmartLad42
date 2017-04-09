@@ -8,8 +8,8 @@ const fs = require('fs');
 //sleep
 
 //bot token shh
-const token = 'MzAwMDI1NjMwNzE0NDk0OTc2.C8mt1w.n17F0ZiVIWLQ21t1dgemob2AqJ0';
-const token2 = '246421186777448460';
+const token = '';
+const token2 = '';
 
 //initializes the bot to logon
 bot.on('ready', () =>{
@@ -63,6 +63,14 @@ var scotsman = ["Mr.","pajama-wearin'","basket-face","slipper-wieldin'",
                 "yellow-bellied","weak-stomached","cowerin'","bot-codin'","matt-hatin'",
                 "dnd-cancellin'","time-knowin'","matt-bein'","glover-playin'","scream typin'",
                 "programmin'","calc-failin'","ninny","project-doin'","roblox-lovin'","facebook-postin'"];
+
+var scotsmanNouns = ["apple-john","baggage","barnacle","bladder","boar-pig","bugbear","bum-bailey",
+                     "canker-blossom","clack-dish","clotpole","coxcomb","codpiece","death-token",
+                     "dewberry","flap-dragon","flax-wench","flirt-gill","floot-licker","fustilarian",
+                     "giglet","gudgeon","haggard","harpy","hedge-pig","horn-beast","hugger-mugger",
+                     "hoithead","lewdster","lout","maggot-pie","malt-worm","mammet","measle","minnow",
+                     "miscreant","moldwarp","mumble-news","nut-hook","pigeaon-egg","pignut","puttock",
+                     "pumpion","ratsbane","scut","skainsmate","strumpet","varlot","vassal","whey-face","wagtail"];
 
 //compares the song array
 function songCompare(a,b){
@@ -223,7 +231,7 @@ bot.on('message',message=>{
     //scotsman insults
     if(message.content.startsWith('scotsman'))
     {
-        message.channel.sendMessage(randomWords(scotsman, Math.floor( Math.random()*20)).toUpperCase(),{tts:true});
+        message.channel.sendMessage((randomWords(scotsman, Math.floor( Math.random()*20)) + randomWords(scotsmanNouns, 1)).toUpperCase(),{tts:true});
     }
 
     if(message.content.substr(0,5) === 'learn'){
