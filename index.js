@@ -41,7 +41,22 @@ var words = ["Blood Money","Benji","Funny Money","Yard ","Pots of Money",
              "Flossy","Thizz","Bling Bling","Frankenstein Controls","CIA radio",
              "Dianna Cowern", "Flava Flav","What","Time","You know what time it is",
              "Clock","Vanta Black","Red Oyster","Hottie","New York", "Hoopz",
-             "Goldie","Smiley","Cutie"];
+             "Goldie","Smiley","Cutie","Big Rick","died","smoked","ran","talked",
+             "is","and","who","the","where","what","so","then","killed himself",
+             "talks","walks","eats","fart","a","an","who","@@@","yup","woah",
+             "there","that","was","is","today","tommorow","hello","someone",
+             "watches","I","am","god","fear","me","I","will","murder","everyone",
+             "Tommorow","at","seven","o'clock","don't","come","to","school",
+             "The","man","is","insane","he","thinks","he","is","me","but","he",
+             "doesn't","look","like","me","or","talk","like","me","he","is",
+             "a","duckman"];
+
+//compares the song array
+function songCompare(a,b){
+    //the first elements store the amount of times played
+    return (parseInt(b[1] ) - parseInt(a[1]));
+    
+}
 
 //generates a string of random words
 function randomWords(size){
@@ -96,10 +111,9 @@ function audioStream(message,connection){
         dispatcher.setVolume(songData[1]);
         //fires when the stream ends
         dispatcher.on('end',()=>{
-        //begins another audio stream with the connection if has a voicechannel
-        //and a dispatcher
-        return audioStream(message,connection);
-
+            //begins another audio stream with the connection if has a voicechannel
+            //and a dispatcher
+            return audioStream(message,connection);
         });
     }
 
@@ -266,15 +280,44 @@ bot.on('message',message=>{
         
         
     }
-    if(message.content === 'leaderboard'){
+    if(message.content.substr(0,3) === 'top'){
+        var num = parseInt(message.content.substr(3,message.length));
+        //searching the top boys
+        message.reply("Analyzing the top " + num + "... please hold...");
+        //grabbing the songlist and splitting it up
+        var songs = fs.readFileSync('\songs.txt', 'utf8');
+        var songArray = songs.split("|");
+        var newArray = [];
+        
+        //going to store the song name and times played in a array
+        //part of one bigger array
+        for(var i=0;i<songArray.length-1;i+=2){
+            //i is the song, i+1 is the # times played
+            newArray.push([songArray[i],songArray[i+1],i/2]);
+        }
+        
+        //sort using songComparator defined
+        newArray.sort(songCompare);
+
+        //making sure the number was inputed correctly
+        if(!isNaN(num)){
+            //making sure it's also not larger than the array size
+            if(num > newArray.length){
+                return message.reply("The are only " + newArray.length + " songs!");
+            }
+            //then printing out the top boys 
+            for(var i=1;i<=num;i++){
+                message.channel.sendMessage(i +". |" + " Song #" + newArray[i][2] + " Played " + newArray[i][1] + " times " + " (" + newArray[i][0] + ")");
+            }
+        }
+        else{
+            message.reply("Invalid format!");
+        }
+        
 
     }
 
-
-
-
 });
-
 
 
 bot.login(token);
