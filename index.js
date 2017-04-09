@@ -44,12 +44,22 @@ var words = ["Blood Money","Benji","Funny Money","Yard ","Pots of Money",
              "Goldie","Smiley","Cutie","Big Rick","died","smoked","ran","talked",
              "is","and","who","the","where","what","so","then","killed himself",
              "talks","walks","eats","fart","a","an","who","@@@","yup","woah",
-             "there","that","was","is","today","tommorow","hello","someone",
-             "watches","I","am","god","fear","me","I","will","murder","everyone",
+             "there","that","was","is","today","tomorrow","hello","someone",
+             "watches","I","am","God","fear","me","I","will","murder","everyone",
              "Tommorow","at","seven","o'clock","don't","come","to","school",
              "The","man","is","insane","he","thinks","he","is","me","but","he",
              "doesn't","look","like","me","or","talk","like","me","he","is",
-             "a","duckman"];
+             "a","duckman","rururururu","clown","heckin'","ratboy genius","mime",
+             "Zain"];
+
+var scotsman = ["Mr.","pajama-wearin'","basket-face","slipper-wieldin'",
+                "clype-dreep-bachle","gether-uping-blate-maw","bleathering gomeril",
+                "jessie","oaf-lookin'","stoner","nyaff"," plookie","shan","milk drinkin'",
+                "soy-faced","shilpit","mim-moothed","snivelin'","worm-eyed",
+                "hotten-blaugh","vile","stoochie","cally-breek-tattie","bug fightin'",
+                "jellyfish jumpin'","back-fur lovin'","needle pullin'","ladybud lovin'",
+                "time slot losin'","april foolin'","time wastin'","frogpostin'","doglovin'",
+                "spear-chuckin'","acid-trippin'"];
 
 //compares the song array
 function songCompare(a,b){
@@ -59,13 +69,13 @@ function songCompare(a,b){
 }
 
 //generates a string of random words
-function randomWords(size){
+function randomWords(data, size){
     var returnstring = '';
     for(var i=0;i<size-1;i++){
-        returnstring+= words[Math.floor( Math.random()*words.length)] + " ";
+        returnstring+= data[Math.floor( Math.random()*data.length)] + " ";
     }
-    returnstring+= words[Math.floor( Math.random()*words.length)];
-    return returnstring;
+    returnstring+= data[Math.floor( Math.random()*data.length)];
+    return returnstring.toUpperCase();
 }
 
 bot.on('presenceUpdate',Presence=>{
@@ -201,12 +211,18 @@ bot.on('message',message=>{
 
         }
     }
-
+    //gw
     if (message.content.startsWith('God says...')) {
 
-        message.channel.sendMessage(randomWords(Math.floor( Math.random()*20)),{tts:true});
+        message.channel.sendMessage(randomWords(words, Math.floor( Math.random()*20)),{tts:true});
 
     }
+    //scotsman insults
+    if(message.content.startsWith('scotsman'))
+    {
+        message.channel.sendMessage(randomWords(scotsman, Math.floor( Math.random()*20)),{tts:true});
+    }
+
     if(message.content.substr(0,5) === 'learn'){
         console.log("writing");
         fs.appendFile("\songs.txt", message.content.substr(6,message.content.length) + "|0|", function(err) {
