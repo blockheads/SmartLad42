@@ -91,11 +91,12 @@ function audioStream(message,connection){
         let stream = yt(songData[0],{audioonly:true});
         //setting the dispatcher to play the stream
         dispatcher = connection.playStream(stream);
+        dispatcher.setVolume(songData[1]);
         //fires when the stream ends
         dispatcher.on('end',()=>{
         //begins another audio stream with the connection if has a voicechannel
         //and a dispatcher
-        audioStream(message,connection);
+        return audioStream(message,connection);
         
         });
     }
@@ -147,7 +148,7 @@ function getSong(message){
             
          
             var song = songArray[randomIndex];
-            var volume = parseFloat( songArray[randomIndex +1])/10;
+            var volume = (parseInt( songArray[randomIndex +1])) /10;
             console.log(song + " selected");
 
             return [song,volume];
@@ -246,13 +247,21 @@ bot.on('message',message=>{
       message.reply("HEIL");
     }
     if(message.content.includes('scream')){
-        
-        dispatcher.end();
+        //delete this.
+        if(dispatcher){
+            dispatcher.end();
+            dispatcher = null;
+        }
         playAudioInSwamp(screams[Math.floor(Math.random()*screams.length)],1000000);
     }
     if(message.content === 'skip'){
-        //to skip first we have to end the current dispatcher
-        dispatcher.end();
+        //making sure the dispatcher exists
+        if(dispatcher){
+            //to skip first we have to end the current dispatcher
+            dispatcher.end();
+            dispatcher = null;
+        }
+        
         
     }
     if(message.content === 'leaderboard'){
