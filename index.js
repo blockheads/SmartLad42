@@ -5,10 +5,11 @@ const bot = new Discord.Client();
 const yt = require('ytdl-core');
 //write to file
 const fs = require('fs');
+//sleep
 
 //bot token shh
-const token = 'MzAwMDI1NjMwNzE0NDk0OTc2.C8mt1w.n17F0ZiVIWLQ21t1dgemob2AqJ0';
-const token2 = '246421186777448460';
+const token = '';
+const token2 = '';
 
 //initializes the bot to logon
 bot.on('ready', () =>{
@@ -20,6 +21,8 @@ var fuckMatt = false;
 var voiceChannel = null;
 //the dispatcher the bot uses for voice activity
 var dispatcher = null;
+//flag if the player is streaming or not
+var streaming = false;
 
 var screams = ["https://youtu.be/CKUDgLYfzAw","https://youtu.be/-p1OGgPkLcw",
                 "https://youtu.be/8w0SpnL_Ysg","https://youtu.be/bSK0wmREv5g",
@@ -81,21 +84,22 @@ function playAudioInSwamp(song,volume){
 
 //continually stream audio 
 function audioStream(message,connection){
-    //grabing the volume and song
-    var songData = getSong(message);
-    let stream = yt(songData[0],{audioonly:true});
-    //setting the dispatcher to play the stream
-    dispatcher = connection.playStream(stream);
-    //fires when the stream ends
-    dispatcher.on('end',()=>{
+    //this can only be called while streaming
+    if(streaming){
+        //grabing the volume and song
+        var songData = getSong(message);
+        let stream = yt(songData[0],{audioonly:true});
+        //setting the dispatcher to play the stream
+        dispatcher = connection.playStream(stream);
+        //fires when the stream ends
+        dispatcher.on('end',()=>{
         //begins another audio stream with the connection if has a voicechannel
         //and a dispatcher
-        if(dispatcher!=null && voiceChannel!=null){
-            audioStream(message,connection);
-        }
-        //otherwise break out of recursive calls
+        audioStream(message,connection);
         
-    });
+        });
+    }
+    
     
 }
 
@@ -111,8 +115,10 @@ function getSong(message){
                 var randomIndex = Math.floor( Math.random()*(  songArray.length*1));
             }while(randomIndex%2 ==1)
 
+            
             message.channel.sendMessage("Song #" + Math.floor(randomIndex/2) + " selected out of " + Math.floor(songArray.length/2) + " known songs.");
             message.channel.sendMessage("Song #" + Math.floor(randomIndex/2) + " has been selected " + songArray[randomIndex + 1] + " times.");
+            
             
             //modifying new song length
             //have to re-write whole file unfortunately (can't think of better way)
@@ -141,7 +147,7 @@ function getSong(message){
             
          
             var song = songArray[randomIndex];
-            var volume = parseInt( songArray[randomIndex +1])/10;
+            var volume = parseFloat( songArray[randomIndex +1])/10;
             console.log(song + " selected");
 
             return [song,volume];
@@ -196,24 +202,33 @@ bot.on('message',message=>{
         }); 
     }
     if(message.content === 'start radio'){
-        //first if checks if voiceChannel exists
-        if(!voiceChannel){
-            voiceChannel = message.member.voiceChannel;
-            //this checks if user in voice channel who sent 'start radio' message
+        //so you can't break the bot
+        if(!streaming){
+            //begin streaming audio
+            streaming = true;
+            //first if checks if voiceChannel exists
             if(!voiceChannel){
-                return message.reply("error, not in voice channel");
+                voiceChannel = message.member.voiceChannel;
+                //this checks if user in voice channel who sent 'start radio' message
+                if(!voiceChannel){
+                    return message.reply("error, not in voice channel");
+                }
             }
+            //joining the voice channel
+            voiceChannel.join()
+            //initializing a connection as a promise
+            .then(connection=>{
+                //inside here we simply play music
+                audioStream(message,connection);
+            });
         }
-        //joining the voice channel
-        voiceChannel.join()
-        //initializing a connection as a promise
-        .then(connection=>{
-            //inside here we simply play music
-            audioStream(message,connection);
-        });
+        
 
     }
     if(message.content === 'stop radio' || message.content === 'stop screaming'){
+        //stop streaming
+        streaming=false;
+
         //nullifying everything and leaving the channel
         if(dispatcher){
             dispatcher.end();
@@ -222,8 +237,7 @@ bot.on('message',message=>{
             voiceChannel.leave();   
         }
         dispatcher = null;
-        voiceChannel = null;
-        
+        voiceChannel = null;       
     }
     if(message.content === 'fuck matt'){
         fuckMatt=!fuckMatt;
@@ -232,20 +246,17 @@ bot.on('message',message=>{
       message.reply("HEIL");
     }
     if(message.content.includes('scream')){
-            
-            dispatcher.end();
-            playAudioInSwamp(screams[Math.floor(Math.random()*screams.length)],1000000);
+        
+        dispatcher.end();
+        playAudioInSwamp(screams[Math.floor(Math.random()*screams.length)],1000000);
     }
     if(message.content === 'skip'){
         //to skip first we have to end the current audio stream
         dispatcher.end();
+        //so you cant break it by spamming skip calls
         //then lets resume the radio by starting a new connection
         voiceChannel.join()
-        //initializing a connection as a promise
-        .then(connection=>{
-            //inside here we simply play music
-            audioStream(connection);
-        });
+        
     }
     if(message.content === 'leaderboard'){
         
