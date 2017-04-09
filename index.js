@@ -78,7 +78,7 @@ function randomWords(data, size){
         returnstring+= data[Math.floor( Math.random()*data.length)] + " ";
     }
     returnstring+= data[Math.floor( Math.random()*data.length)];
-    return returnstring.toUpperCase();
+    return returnstring;
 }
 
 bot.on('presenceUpdate',Presence=>{
@@ -223,7 +223,7 @@ bot.on('message',message=>{
     //scotsman insults
     if(message.content.startsWith('scotsman'))
     {
-        message.channel.sendMessage(randomWords(scotsman, Math.floor( Math.random()*20)),{tts:true});
+        message.channel.sendMessage(randomWords(scotsman, Math.floor( Math.random()*20)).toUpperCase(),{tts:true});
     }
 
     if(message.content.substr(0,5) === 'learn'){
