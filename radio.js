@@ -51,7 +51,6 @@ module.exports =
             if(dispatcher){
                 //to skip first we have to end the current dispatcher
                 dispatcher.end();
-                dispatcher = null;
             }
     },
 
