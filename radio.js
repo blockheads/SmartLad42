@@ -175,6 +175,7 @@ function playAudioInSwamp(song,volume,bot){
             dispatcher.setVolume(volume);
             dispatcher.on('end', () => {
                 if(voiceChannel){
+                    streaming = false;
                     voiceChannel.leave();
                 }
             });
