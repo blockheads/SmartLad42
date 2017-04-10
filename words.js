@@ -33,14 +33,23 @@ var scotsman = ["Mr.","pajama-wearin'","basket-face","slipper-wieldin'",
                 "spear-chuckin'","acid-trippin'","no-good","pansy","lily-livered",
                 "yellow-bellied","weak-stomached","cowerin'","bot-codin'","matt-hatin'",
                 "dnd-cancellin'","time-knowin'","matt-bein'","glover-playin'","scream typin'",
-                "programmin'","calc-failin'","ninny","project-doin'","roblox-lovin'","facebook-postin'"];
+                "programmin'","calc-failin'","ninny","project-doin'","roblox-lovin'","facebook-postin'",
+                "base-court","bat-fowlin'","beef-witted","beetle-headed","boil-brained","clapper-clawed",
+                "clay-brained","common-kissin'","crook-pated","dismal-dreaming","dizzy-eyed",
+                "doghearted","dread-bolted","earth-vexin'","elf-skinned","fat-kidneyed","fen-sucked",
+                "flap-mouthed","fly-bitten","folly-fallen","fool-born","full-gorged","guts-gripin'",
+                "half-faced","hasty-witted","hedge-born","hell-hated","idle-headed","ill-breedin'",
+                "ill-nurtured","knotty-pated","milk-livered","motley-minded","onion-eyed",
+                "plume-plucked","pox-marked","reeling-ripe","rough-hewn","rude-growin'","rump-fed",
+                "shard-borne","sheep-bitin'","spur-gaited","swag-bellied","tardy-gaited",
+                "tickle-brained","toad-spotted","unchin-snouted","weatherbitten"];
 
 var scotsmanNouns = ["apple-john","baggage","barnacle","bladder","boar-pig","bugbear","bum-bailey",
                      "canker-blossom","clack-dish","clotpole","coxcomb","codpiece","death-token",
-                     "dewberry","flap-dragon","flax-wench","flirt-gill","floot-licker","fustilarian",
+                     "dewberry","flap-dragon","flax-wench","flirt-gill","foot-licker","fustilarian",
                      "giglet","gudgeon","haggard","harpy","hedge-pig","horn-beast","hugger-mugger",
                      "hoithead","lewdster","lout","maggot-pie","malt-worm","mammet","measle","minnow",
-                     "miscreant","moldwarp","mumble-news","nut-hook","pigeaon-egg","pignut","puttock",
+                     "miscreant","moldwarp","mumble-news","nut-hook","pigeon-egg","pignut","puttock",
                      "pumpion","ratsbane","scut","skainsmate","strumpet","varlot","vassal","whey-face","wagtail"];
 
 
@@ -63,6 +72,6 @@ module.exports =
     
     //generates random words from scotsman & scotsmanNouns
     scotsman : function (message){
-        message.channel.sendMessage((randomWords(scotsman, Math.floor( Math.random()*20)) + randomWords(scotsmanNouns, 1)).toUpperCase(),{tts:true});
+        message.channel.sendMessage("**" + (randomWords(scotsman, Math.floor( Math.random()*20)) + " " + randomWords(scotsmanNouns, 1)).toUpperCase() + "**",{tts:true});
     }
 }
