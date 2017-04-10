@@ -67,7 +67,7 @@ module.exports =
 {
     //generates random words from randomWords
     godSays : function (message){
-        message.channel.sendMessage(randomWords(words, Math.floor( Math.random()*20)),{tts:true});
+        message.channel.sendMessage("*" + randomWords(words, Math.floor( Math.random()*20)) + "*",{tts:true});
     },
     
     //generates random words from scotsman & scotsmanNouns
