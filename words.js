@@ -33,7 +33,16 @@ var scotsman = ["Mr.","pajama-wearin'","basket-face","slipper-wieldin'",
                 "spear-chuckin'","acid-trippin'","no-good","pansy","lily-livered",
                 "yellow-bellied","weak-stomached","cowerin'","bot-codin'","matt-hatin'",
                 "dnd-cancellin'","time-knowin'","matt-bein'","glover-playin'","scream typin'",
-                "programmin'","calc-failin'","ninny","project-doin'","roblox-lovin'","facebook-postin'"];
+                "programmin'","calc-failin'","ninny","project-doin'","roblox-lovin'","facebook-postin'",
+                "base-court","bat-fowlin'","beef-witted","beetle-headed","biol-brained","clapper-clawed",
+                "clay-brained","common-kissin'","crook-pated","dismal-dreaming","dizzy-eyed",
+                "doghearted","dread-bolted","earth-vexin'","elf-skinned","fat-kindeyed","fen-sucked",
+                "flap-mouthed","fly-bitten","folly-fallen","fool-born","full-gorged","guts-gripin'",
+                "half-faced","hasty-witted","hedge-born","hell-hated","idle-headed","ill-breedin'",
+                "ill-nurtured","knotty-pated","milk-livered","motley-minded","onion-eyed",
+                "plume-plucked","pox-marked","reeling-ripe","rough-hewn","rude-growin'","rump-fed",
+                "shard-borne","sheep-bitin'","spur-gaited","swag-bellied","tardy-gaited",
+                "tickle-brained","toad-spotted","unchin-snouted","weatherbitten"];
 
 var scotsmanNouns = ["apple-john","baggage","barnacle","bladder","boar-pig","bugbear","bum-bailey",
                      "canker-blossom","clack-dish","clotpole","coxcomb","codpiece","death-token",
@@ -63,6 +72,6 @@ module.exports =
     
     //generates random words from scotsman & scotsmanNouns
     scotsman : function (message){
-        message.channel.sendMessage((randomWords(scotsman, Math.floor( Math.random()*20)) + randomWords(scotsmanNouns, 1)).toUpperCase(),{tts:true});
+        message.channel.sendMessage("**" + (randomWords(scotsman, Math.floor( Math.random()*20)) + " " + randomWords(scotsmanNouns, 1)).toUpperCase() + "**",{tts:true});
     }
 }
