@@ -2,6 +2,8 @@
 const words = require('./words.js');
 //for radio.js functions
 const radio = require('./radio.js');
+//for tendies.js functions
+const tendies = require('./tendies.js');
 
 var fuckMatt = false;
 
@@ -61,6 +63,15 @@ module.exports =
         }
         if(message.content.substr(0,3) === 'top'){
             radio.leaderboard(message);
+        }
+        if(message.content === ('register')){
+            
+            message.reply("Atempting to register you to tendies.net please wait...");
+            tendies.initializePlayer(message);
+
+        }
+        if(message.content === ('tendies') || message.content === ('tendos')){
+            tendies.printTendies(message);
         }
     }
 
