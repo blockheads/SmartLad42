@@ -1,5 +1,7 @@
 //write to file
 const fs = require('fs');
+//for tendie actions
+const user = require('./tendieUser.js');
 
 //stores guildMembers and tendies
 var tendieMap = new Map();
@@ -14,8 +16,7 @@ module.exports = {
         console.log("printing tendies");
         //gets the users tendies if initialized
         if(isInitialized(message.member)){
-            console.log(tendieMap);
-            message.reply("you currently have" + "# " + tendieMap.get(message.member.displayName) + " tendies.");
+            message.reply("you currently have #" + tendieMap.get(message.member.id).getTendies() + " tendies.");
         }
     },
     //initializes the player in users.txt
@@ -24,7 +25,7 @@ module.exports = {
         if(!isInitialized(message.member)){
             
             //stores username|#tendies
-            fs.appendFile("tendiebox.txt", message.member.displayName + "|0|", function(err) {
+            fs.appendFile("tendiebox.txt", message.member.id + "|0|", function(err) {
                 if(err) {
                     return console.log(err);
                 }
@@ -37,6 +38,15 @@ module.exports = {
         else{
             message.reply("you are already registered to tendies.net");
         }
+    },
+    mineTendies : function(message){
+        //initializes mining
+        message.reply("You decide to go to work on the tendie mines");
+        tendieMap.get(message.member.id).beginMine(message);
+        
+    },
+    update : function(){
+        updateFile();
     }
 }
 
@@ -47,7 +57,7 @@ function isInitialized(guildmember){
    
    //iterate over keys in tendieMap until found or not
    for(var key of tendieMap.keys()){
-       if(key === guildmember.displayName){
+       if(key === guildmember.id){
            return true;
        }
    }
@@ -67,7 +77,18 @@ function updateMap(){
     
     //now storing the data in tendieMap
     for(i=0;i<tendieArray.length/2;i+=2){
-        tendieMap.set(tendieArray[i],tendieArray[i+1]);
+        tendieMap.set(tendieArray[i],new user.tendieUser(tendieArray[i],tendieArray[i+1]));
     }
 }
 
+//updates the file given the player and information
+function updateFile(){
+    var logger = fs.createWriteStream('tendiebox.txt', {
+        //flags: 'a' // 'a' means appending (old data will be preserved)
+    })
+
+    //going through the tendie map and setting the file to it
+    for(var key of tendieMap.keys()){
+        logger.write(key + "|" + tendieMap.get(key) + "|");
+    }
+}

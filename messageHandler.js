@@ -64,14 +64,16 @@ module.exports =
         if(message.content.substr(0,3) === 'top'){
             radio.leaderboard(message);
         }
-        if(message.content === ('register')){
+        if(message.content === ('tendieRegister')){
             
             message.reply("Atempting to register you to tendies.net please wait...");
             tendies.initializePlayer(message);
-
         }
         if(message.content === ('tendies') || message.content === ('tendos')){
             tendies.printTendies(message);
+        }
+        if(message.content === ('tendieMine')){
+            tendies.mineTendies(message);
         }
     }
 

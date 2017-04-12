@@ -1,4 +1,4 @@
-const token2 = '';
+const token2 = '246421186777448460';
 
 //youtube object
 const yt = require('ytdl-core');
