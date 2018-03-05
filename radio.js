@@ -1,35 +1,38 @@
-const token2 = '246421186777448460';
+const token2 = '160585138076516353';
 
 //youtube object
 const yt = require('ytdl-core');
 //write to file
 const fs = require('fs');
 
-//the voice channel the bot is currently in
-var voiceChannel = null;
-//the dispatcher the bot uses for voice activity
-var dispatcher = null;
-//flag if the player is streaming or not
-var streaming = false;
-
-
 var screams = ["https://youtu.be/CKUDgLYfzAw","https://youtu.be/-p1OGgPkLcw",
                 "https://youtu.be/8w0SpnL_Ysg","https://youtu.be/bSK0wmREv5g",
                 "https://youtu.be/AsAAybD5iKU","https://youtu.be/Rq2vdkfjaMg"];
+
+var streaming = false;
 
 //public functions
 module.exports = 
 {
     //stops the current audio stream
-    stop: function(){
-        //stop streaming
-        streaming=false;
+    stop: function(message){
 
-        if(voiceChannel){
-            voiceChannel.leave();
+        if(!streaming){
+            return message.reply("I am not playing anything!");
         }
-        dispatcher = null;
-        voiceChannel = null;
+
+        console.log("stop function executing...");
+
+        //stop streaming
+        if( !message.member.voiceChannel ){
+            return message.reply("You are not in a voice channel!");
+        }
+
+        streaming = false;
+
+        message.member.voiceChannel.leave();
+        return undefined;
+        
     },
 
     //modifies the current songs volume
@@ -46,22 +49,28 @@ module.exports =
     },
 
     //skips the current song
-    skip: function (){
-        //making sure the dispatcher exists
-            if(dispatcher){
-                //to skip first we have to end the current dispatcher
-                dispatcher.end();
-            }
+    skip: function (message){
+        
+        if(!streaming){
+            return message.reply("I am not playing anything!");
+        }
+
+        console.log("skip function executing...");
+
+        //stop streaming
+        if( !message.member.voiceChannel ){
+            return message.reply("You are not in a voice channel!");
+        }
+
+        streaming = false;
+        return startRadio(message);
     },
 
-    scream : function (bot){
+    scream : function (message,bot){
         //delete this.
         if(dispatcher){
-            //stop streaming
-            streaming=false;
-            dispatcher.end();
-            dispatcher = null;
-            voiceChannel = null;
+            //then just stop the audio
+            stop();
         }
         //now that refreashed start streaming the scream
         streaming=true;
@@ -74,34 +83,32 @@ module.exports =
             if(err) {
                 return console.log(err);
             }
-
-
             console.log("The file was saved!");
         });
     },
 
     //starts up the radio
-    startRadio: function (message){
-    //so you can't break the bot
-    if(!streaming){
-        //begin streaming audio
-        streaming = true;
-        //first if checks if voiceChannel exists
+    startRadio: async function (message){
+        
+        if(streaming){
+            return message.reply("I'm already playing something!");
+        }
+
+        const voiceChannel = message.member.voiceChannel;
         if(!voiceChannel){
-            voiceChannel = message.member.voiceChannel;
-            //this checks if user in voice channel who sent 'start radio' message
-            if(!voiceChannel){
-                return message.reply("error, not in voice channel");
-            }
+            return message.reply("error, not in voice channel");
         }
+        
         //joining the voice channel
-        voiceChannel.join()
-        //initializing a connection as a promise
-        .then(connection=>{
-            //inside here we simply play music
-            audioStream(message,connection);
-        });
+        try{
+            var connection = await voiceChannel.join();
+            
         }
+        catch (error){
+            console.error("could not join the voice channel, error: ${error} ");
+            return message.channel.send("I could not join the voice channel, error: {$error}");
+        }    
+        return audioStream( message, connection );
     },
 
     //gets top songs
@@ -149,9 +156,11 @@ module.exports =
             dispatcher.end();
             dispatcher = null;
             voiceChannel = null;
+            if(connection){
+                connection = null;
+            }
         }
-        //now that refreashed start streaming the scream
-        streaming=true;
+        
         playAudioInSwamp(song,volume,bot);
     }
 
@@ -161,11 +170,11 @@ module.exports =
 
 
 //singularly play audio on end of audio stream leave channel (defaults to swamp)
-function playAudioInSwamp(song,volume,bot){
+function playAudioInSwamp( song,volume,bot ){
     if(streaming){
         voiceChannel = bot.channels.get(token2);
         if (!voiceChannel) {
-            console.log("null VoiceChannel")
+            console.log("null VoiceChannel");
         }
         voiceChannel.join()
             .then(connnection => {
@@ -184,37 +193,55 @@ function playAudioInSwamp(song,volume,bot){
 }
 
 //continually stream audio
-function audioStream(message,connection){
-    //this can only be called while streaming
-    if(streaming){
-        //grabing the volume and song
-        var songData = getSong(message);
-        let stream = yt(songData[0],{audioonly:true});
-        //setting the dispatcher to play the stream
-        dispatcher = connection.playStream(stream);
-        dispatcher.setVolume(songData[1]);
-        //fires when the stream ends
-        dispatcher.on('end',()=>{
-            //begins another audio stream with the connection if has a voicechannel
-            //and a dispatcher
-            audioStream(message,connection);
-        });
+async function audioStream(message,connection){
+    
+    //grabing the volume and song
+    try{
+        var songData = await getSong(message);
     }
+    catch (error){
+        console.error("could get song, error: ${error} ");
+    }
+    
+    var songname = songData[0];
+    await console.log(`retrieved  from function call: ${songname}`);
+
+
+    //we are now streaming audio!
+    streaming = true;
+
+    //setting the dispatcher to play the stream
+    const dispatcher = await connection.playStream(yt(songname))
+        .on('end', () => {
+            
+            console.log("The song has ended.");
+            //check if we are still playing audio
+            if(streaming){
+                audioStream(message,connection);
+            }
+            else{
+                connection.disconnect();
+            }
+        
+    });
+
+    //choosing the volume
+    dispatcher.setVolume(songData[1]);
 
 
 }
 
 //gets a song with a volume
-function getSong(message){
+async function getSong(message){
     try {
-            var songs = fs.readFileSync('\songs.txt', 'utf8');
-            console.log("songlist: " + songs);
-            var songArray = songs.split("|");
+            var songs = await fs.readFileSync('\songs.txt', 'utf8');
+            var songArray = await songs.split("|");
+            
             //makes sure to select a song, not the number of times played
             //song at even indencis
             do{
-                var randomIndex = Math.floor( Math.random()*(  songArray.length*1));
-            }while(randomIndex%2 ==1)
+                var randomIndex = Math.floor( Math.random()*(  songArray.length-1) );
+            } while(randomIndex%2 ==1)
 
 
             message.channel.sendMessage("Song #" + Math.floor(randomIndex/2) + " selected out of " + Math.floor(songArray.length/2) + " known songs.");
@@ -225,7 +252,7 @@ function getSong(message){
             //have to re-write whole file unfortunately (can't think of better way)
 
 
-            var logger = fs.createWriteStream('\songs.txt', {
+            var logger = await fs.createWriteStream('\songs.txt', {
                 //flags: 'a' // 'a' means appending (old data will be preserved)
             })
 

@@ -8,7 +8,7 @@ const mh = require('./messageHandler.js');
 const radio = require('./radio.js')
 
 //bot token shh
-const token = '';
+const token = 'MzAwMDI1NjMwNzE0NDk0OTc2.C8mt1w.n17F0ZiVIWLQ21t1dgemob2AqJ0';
 
 
 //initializes the bot to logon
@@ -29,7 +29,7 @@ bot.on('presenceUpdate',Presence=>{
 });
 
 //event listener for any messages
-bot.on('message',message=>{
+bot.on('message', async message =>{
     mh.messageHandle(message,bot);
 });
 

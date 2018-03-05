@@ -25,7 +25,7 @@ module.exports = {
         if(!isInitialized(message.member)){
             
             //stores username|#tendies
-            fs.appendFile("tendiebox.txt", message.member.id + "|0|", function(err) {
+            fs.appendFile("./tendie/tendiebox.txt", message.member.id + "|0|", function(err) {
                 if(err) {
                     return console.log(err);
                 }
@@ -41,7 +41,6 @@ module.exports = {
     },
     mineTendies : function(message){
         //initializes mining
-        message.reply("You decide to go to work on the tendie mines");
         tendieMap.get(message.member.id).beginMine(message);
         
     },
@@ -71,7 +70,7 @@ function updateMap(){
     //nullifying tendieMap to rewrite it
     tendieMap = new Map();
     //getting the tendielist file  
-    var tendieList = fs.readFileSync('tendiebox.txt', 'utf8');
+    var tendieList = fs.readFileSync('./tendie/tendiebox.txt', 'utf8');
     //splitting up the tendie list 
     var tendieArray = tendieList.split("|");
     
@@ -83,12 +82,12 @@ function updateMap(){
 
 //updates the file given the player and information
 function updateFile(){
-    var logger = fs.createWriteStream('tendiebox.txt', {
+    var logger = fs.createWriteStream('./tendie/tendiebox.txt', {
         //flags: 'a' // 'a' means appending (old data will be preserved)
     })
 
     //going through the tendie map and setting the file to it
     for(var key of tendieMap.keys()){
-        logger.write(key + "|" + tendieMap.get(key) + "|");
+        logger.write(key + "|" + tendieMap.get(key).getTendies() + "|");
     }
 }

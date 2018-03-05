@@ -3,7 +3,9 @@ const words = require('./words.js');
 //for radio.js functions
 const radio = require('./radio.js');
 //for tendies.js functions
-const tendies = require('./tendies.js');
+const tendies = require('./tendie/tendies.js');
+//write to files
+const fs = require('fs');
 
 var fuckMatt = false;
 
@@ -12,7 +14,7 @@ var fuckMatt = false;
 module.exports = 
 {
     //main function handles a message
-    messageHandle: function (message,bot){
+    messageHandle: async function (message,bot){
         if(fuckMatt && message.author.id==='193186571615207424'){
             message.delete();
             message.reply("fuck you matt");
@@ -47,7 +49,7 @@ module.exports =
             radio.startRadio(message);
         }
         if(message.content === 'stop radio' || message.content === 'stop screaming'){
-            radio.stop();
+            radio.stop(message);
         }
         if(message.content === 'fuck matt'){
             fuckMatt=!fuckMatt;
@@ -59,7 +61,7 @@ module.exports =
             radio.scream(bot);
         }
         if(message.content === 'skip'){
-            radio.skip();
+            radio.skip(message);
         }
         if(message.content.substr(0,3) === 'top'){
             radio.leaderboard(message);
@@ -75,6 +77,46 @@ module.exports =
         if(message.content === ('tendieMine')){
             tendies.mineTendies(message);
         }
+        if(message.content.substr(0,4) === ('!rtd')){
+            message.reply("rolling a d" +message.content.substr(5,6) + "...");
+            message.reply("I rolled a " + Math.floor(Math.random() * parseInt(message.content.substr(5,6)) + 1)); 
+        }
+        if(message.content.substr(0,7) === ('addGame')){
+            fs.appendFile("\games.txt", message.content.substr(8,message.content.length) + "|", function(err) {
+                if(err) {
+                    return console.log(err);
+                }
+                message.reply("added " + message.content.substr(8,message.content.length));
+            });
+        }
+        if(message.content === ('pickGame')){
+            var games = fs.readFileSync('\games.txt', 'utf8');
+            var gameArray = games.split("|");
+            if(games.length >0){
+                var ranIndex = Math.floor(Math.random() * (gameArray.length-1));
+                message.reply("I choose " + gameArray [ ranIndex]);
+                
+
+                    
+                var logger = fs.createWriteStream('\games.txt', {
+                    //flags: 'a' // 'a' means appending (old data will be preserved)
+                })
+
+                //now writing everything to the file except the chosen game
+                for(var i = 0; i<gameArray.length-1; i++){
+                    
+                    if(i!=ranIndex){
+                        logger.write(gameArray[i]+ "|") ;
+                    }
+
+                }
+            }
+            else{
+                message.reply("no games in list!");
+            }
+            
+        }
+        
     }
 
 }
