@@ -5,10 +5,9 @@ const bot = new Discord.Client();
 //the message handler
 const mh = require('./messageHandler.js');
 //radio.js
-const radio = require('./radio.js')
+const radio = require('./radio.js');
 
-//bot token shh
-const token = 'MzAwMDI1NjMwNzE0NDk0OTc2.C8mt1w.n17F0ZiVIWLQ21t1dgemob2AqJ0';
+const tokenList = require('./tokens.js');
 
 
 //initializes the bot to logon
@@ -34,4 +33,4 @@ bot.on('message', async message =>{
 });
 
 
-bot.login(token);
+bot.login(tokenList.token);

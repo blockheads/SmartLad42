@@ -1,4 +1,3 @@
-const token2 = '160585138076516353';
 
 //youtube object
 const yt = require('ytdl-core');
@@ -10,6 +9,8 @@ var screams = ["https://youtu.be/CKUDgLYfzAw","https://youtu.be/-p1OGgPkLcw",
                 "https://youtu.be/AsAAybD5iKU","https://youtu.be/Rq2vdkfjaMg"];
 
 var streaming = false;
+
+const tokenList = require('./tokens.js');
 
 //public functions
 module.exports = 
@@ -172,7 +173,7 @@ module.exports =
 //singularly play audio on end of audio stream leave channel (defaults to swamp)
 function playAudioInSwamp( song,volume,bot ){
     if(streaming){
-        voiceChannel = bot.channels.get(token2);
+        voiceChannel = bot.channels.get(tokenList.token2);
         if (!voiceChannel) {
             console.log("null VoiceChannel");
         }
