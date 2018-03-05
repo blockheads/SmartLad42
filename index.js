@@ -7,7 +7,7 @@ const mh = require('./messageHandler.js');
 //radio.js
 const radio = require('./radio.js');
 
-const tokenList = require('./tokens.js');
+const tokens = require('./tokens.js');
 
 
 //initializes the bot to logon
@@ -33,4 +33,4 @@ bot.on('message', async message =>{
 });
 
 
-bot.login(tokenList.token);
+bot.login(tokens.getToken1());

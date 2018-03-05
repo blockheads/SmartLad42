@@ -10,7 +10,8 @@ var screams = ["https://youtu.be/CKUDgLYfzAw","https://youtu.be/-p1OGgPkLcw",
 
 var streaming = false;
 
-const tokenList = require('./tokens.js');
+const tokens = require('./tokens.js');
+
 
 //public functions
 module.exports = 
@@ -173,7 +174,7 @@ module.exports =
 //singularly play audio on end of audio stream leave channel (defaults to swamp)
 function playAudioInSwamp( song,volume,bot ){
     if(streaming){
-        voiceChannel = bot.channels.get(tokenList.token2);
+        voiceChannel = bot.channels.get(tokens.getToken2());
         if (!voiceChannel) {
             console.log("null VoiceChannel");
         }
@@ -212,7 +213,7 @@ async function audioStream(message,connection){
     streaming = true;
 
     //setting the dispatcher to play the stream
-    const dispatcher = await connection.playStream(yt(songname))
+    const dispatcher = await connection.playStream(yt(songname,{filter: "audioonly"}))
         .on('end', () => {
             
             console.log("The song has ended.");

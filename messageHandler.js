@@ -6,6 +6,10 @@ const radio = require('./radio.js');
 const tendies = require('./tendie/tendies.js');
 //write to files
 const fs = require('fs');
+//for sql-lite
+const sql = require("sqlite");
+sql.open("./wordStorage.sqlite");
+
 
 var fuckMatt = false;
 
@@ -116,6 +120,28 @@ module.exports =
             }
             
         }
+        if(message.content.startsWith("sqlstoreword")){
+
+            var split = message.content.split("sqlstoreword");
+
+            sql.run("CREATE TABLE IF NOT EXISTS wordStorage (word TEXT)").then(() => {
+                sql.run("INSERT INTO wordStorage (word) VALUES (?)", ["willitoverwrite?"]);
+                return undefined;
+            });
+            //otherwise overwrite previous entry
+            sql.run(`UPDATE wordStorage SET word = '${split[1]}'`);
+    
+        }
+        if(message.content.startsWith("sqlloadword")){
+
+            sql.get(`SELECT * FROM wordStorage`).then(row => {
+                message.reply(`Your word was : ${row.word}`);
+            }).catch(() => {
+                message.reply("please give me a word first!");
+            });
+            
+            
+        } 
         
     }
 
