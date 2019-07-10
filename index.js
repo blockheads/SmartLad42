@@ -9,10 +9,21 @@ const radio = require('./radio.js');
 
 const tokens = require('./tokens.js');
 
+const sqlite3 = require('sqlite3').verbose();
+
+const fs = require('fs')
+
 
 //initializes the bot to logon
 bot.on('ready', () =>{
     console.log('Smart Boy 42 Online.');
+
+    // building our database tables
+    // opening up our SMART database, very smart new tech
+    let db = new sqlite3.Database('smartDatabase.db');
+    db.run('CREATE TABLE IF NOT EXISTS songs(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, plays INTEGER, user TEXT, time TEXT)');
+    db.close();
+    console.log('ready!');
 });
 
 bot.on('presenceUpdate',Presence=>{

@@ -12,10 +12,10 @@ var streaming = false;
 
 const tokens = require('./tokens.js');
 
+const sqlite3 = require('sqlite3').verbose();
 
 //public functions
-module.exports = 
-{
+module.exports = {
     //stops the current audio stream
     stop: function(message){
 
@@ -53,19 +53,20 @@ module.exports =
     //skips the current song
     skip: function (message){
         
-        if(!streaming){
-            return message.reply("I am not playing anything!");
-        }
+        message.reply("skip under matienence.");
+        // if(!streaming){
+        //     return message.reply("I am not playing anything!");
+        // }
 
-        console.log("skip function executing...");
+        // console.log("skip function executing...");
 
-        //stop streaming
-        if( !message.member.voiceChannel ){
-            return message.reply("You are not in a voice channel!");
-        }
+        // //stop streaming
+        // if( !message.member.voiceChannel ){
+        //     return message.reply("You are not in a voice channel!");
+        // }
 
-        streaming = false;
-        return startRadio(message);
+        // streaming = false;
+
     },
 
     scream : function (message,bot){
@@ -79,14 +80,37 @@ module.exports =
         playAudioInSwamp(screams[Math.floor(Math.random()*screams.length)],1000000,bot);
     },
 
-    learnSong : function (message){
-        console.log("writing");
-        fs.appendFile("\songs.txt", message.content.substr(6,message.content.length) + "|0|", function(err) {
-            if(err) {
-                return console.log(err);
+    learnSong : function (message) {
+
+         //splitting the word based on keyword to retrieve url
+         var split = message.content.split("learn");
+         var url = split[1];
+         //here first we must check if it is a valid youtube link
+         if( !yt.validateURL(url) ){
+             return message.reply(`${url} is not a valid youtube link`);
+         }
+        
+        song = message.content.substr(6,message.content.length);
+
+        let db = new sqlite3.Database('smartDatabase.db');
+        
+        //storing our jsons
+        createdAtJson = JSON.stringify(message.createdAt);
+
+        // insert one row into the langs table
+        db.run(`INSERT INTO songs(name,plays,user,time) VALUES(?,?,?,?)`, [song,0,message.author.username,createdAtJson], function(err) {
+            if (err) {
+                return console.log(err.message);
             }
-            console.log("The file was saved!");
+            // get the last insert id
+            console.log(`A row has been inserted with rowid ${this.lastID}`);
+            message.reply('Thank you ' +  message.author.username + " Your song has been stored on the secure Tendienet™.");
         });
+        
+        // close the database connection
+        db.close();
+
+
     },
 
     //starts up the radio
@@ -104,7 +128,6 @@ module.exports =
         //joining the voice channel
         try{
             var connection = await voiceChannel.join();
-            
         }
         catch (error){
             console.error("could not join the voice channel, error: ${error} ");
@@ -166,7 +189,7 @@ module.exports =
         playAudioInSwamp(song,volume,bot);
     }
 
-}
+};
 
 
 
@@ -199,10 +222,29 @@ async function audioStream(message,connection){
     
     //grabing the volume and song
     try{
-        var songData = await getSong(message);
+        songData = await getSong(message);
+        console.log(songData);
+        // scenario where there is no song....
+        if(!songData){
+            console.log("Recieved no songData");
+            try{
+                if(voiceChannel){
+                    streaming = false;
+                    voiceChannel.leave();
+                }
+                
+            }
+            catch(error){
+                
+            }
+            finally{
+                return;
+            }
+        }
     }
     catch (error){
-        console.error("could get song, error: ${error} ");
+        console.error("could not get song, error: ",error);
+        return;
     }
     
     var songname = songData[0];
@@ -211,6 +253,21 @@ async function audioStream(message,connection){
 
     //we are now streaming audio!
     streaming = true;
+
+    
+    if(!songData[2])
+        username = "UNKNOWN TENDIENET RESIDENT";
+    else{
+        username = songData[2]
+    }
+    if(!songData[3]){
+        timeString = "UNKNOWN TIME";
+    }
+    else{
+        timeString = JSON.parse(songData[3])
+    }
+
+    message.reply("Selected  " + songname + " Which has been played " + songData[1] + " Stored by " + username + " at " + timeString);
 
     //setting the dispatcher to play the stream
     const dispatcher = await connection.playStream(yt(songname,{filter: "audioonly"}))
@@ -228,63 +285,50 @@ async function audioStream(message,connection){
     });
 
     //choosing the volume
-    dispatcher.setVolume(songData[1]);
-
+    dispatcher.setVolume(volumeScale(songData[1]));
 
 }
 
 //gets a song with a volume
 async function getSong(message){
-    try {
-            var songs = await fs.readFileSync('\songs.txt', 'utf8');
-            var songArray = await songs.split("|");
-            
-            //makes sure to select a song, not the number of times played
-            //song at even indencis
-            do{
-                var randomIndex = Math.floor( Math.random()*(  songArray.length-1) );
-            } while(randomIndex%2 ==1)
 
+    return new Promise(function(resolve,reject){
 
-            message.channel.sendMessage("Song #" + Math.floor(randomIndex/2) + " selected out of " + Math.floor(songArray.length/2) + " known songs.");
-            message.channel.sendMessage("Song #" + Math.floor(randomIndex/2) + " has been selected " + songArray[randomIndex + 1] + " times.");
+        // open the database
+        let db = new sqlite3.Database('smartDatabase.db');
 
+        let sql = 'SELECT * FROM songs ORDER BY RANDOM() LIMIT 1';
+        
 
-            //modifying new song length
-            //have to re-write whole file unfortunately (can't think of better way)
-
-
-            var logger = await fs.createWriteStream('\songs.txt', {
-                //flags: 'a' // 'a' means appending (old data will be preserved)
-            })
-
-            for(var i = 0; i<songArray.length; i++){
-                //updating song selected num
-                if(i==randomIndex+1){
-                    var newInt = parseInt( songArray[i]) + 1;
-                    songArray[i] = newInt.toString();
-                }
-                //writing to the file again
-                //if statement makes sure not to concatanate trailing "|"
-                if(i==songArray.length-1){
-                    logger.write(songArray[i]);
-                }
-                else{
-                    logger.write(songArray[i]+ "|");
-                }
-
+        db.get(sql,[],(err,row) => {
+            if (err){
+                reject(console.error(err.message));
             }
 
+            if(!row){
+                message.reply("No songs stored yet, add a song with 'learn <youtubeLink>'");
+                reject("No songs stored yet, add a song to the tendieNet with 'learn <youtubeLink>'");
+            }    
+            
+            console.log(row);
+            songData = [row.name,row.plays,row.user,row.time];
+            
+            // we need to update that row, hence why we keep a primary key, got to stay FAST
+            let sql = 'UPDATE songs SET plays = ? WHERE id = ?';
+            db.get(sql,[row.plays+1,row.id],(err,updateRow) =>{
+                // if we error out it's cool, all we are doing is updating the song play count anyways...
+                if (err){
+                    console.error(err.message);
+                }
+            });
+            
 
-            var song = songArray[randomIndex];
-            var volume = (parseInt( songArray[randomIndex +1])) /10;
-            console.log(song + " selected");
+            db.close();
+            console.log(songData);
+            resolve(songData);
+        });
 
-            return [song,volume];
-
-        } catch(e) {
-            console.log('Error:', e.stack);
-        }
+    });
 }
 
 
@@ -294,3 +338,9 @@ function songCompare(a,b){
     return (parseInt(b[1] ) - parseInt(a[1]));
     
 }
+
+//volume scaling, very important stuff
+function volumeScale(volume){
+    return  Math.abs( Math.cos(volume*10)*Math.pow(1.3,volume)*1/10);
+}
+

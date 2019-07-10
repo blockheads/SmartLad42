@@ -9,8 +9,15 @@
   "author": "Dungler45",
   "license": "ISC",
   "dependencies": {
-    "discord.js": "^11.0.0",
+    "discord.js": "^11.4.2",
+    "ffmpeg": "0.0.4",
     "opusscript": "0.0.3",
-    "ytdl": "^0.5.1"
+    "sqlite": "^3.0.3",
+    "ytdl": "^0.5.1",
+    "ytdl-core": "^0.29.3"
+  },
+  "devDependencies": {
+    "eslint": "^6.0.1",
+    "eslint-config-google": "^0.13.0"
   }
 }
