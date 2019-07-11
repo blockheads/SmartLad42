@@ -21,72 +21,73 @@ module.exports =
             message.delete();
             message.reply("fuck you matt");
         }
-        if(messageContent === 'what is my avatar'){
+        else if(messageContent === 'what is my avatar'){
             //reply with users avatar
             message.reply(message.author.avatarURL);
         }
-        if(messageContent.includes('hitler')){
+        else if(messageContent.includes('hitler')){
             message.reply("Seig Heil");
         }
-        if(messageContent.substr(0,4) === 'play'){
+        else if(messageContent.substr(0,4) === 'play'){
             bot.user.setGame(message.content.substr(4,message.content.length));
         }
-        if(messageContent.substr(0,6) === 'volume'){
+        else if(messageContent.substr(0,6) === 'volume'){
             radio.volume(message);
         }
         //gw
-        if (messageContent.startsWith('god says...')) {
+        else if (messageContent.startsWith('god says...')) {
             words.godSays(message);
         }
         //scotsman insults
-        if(messageContent.startsWith('scotsman'))
+        else if(messageContent.startsWith('scotsman'))
         {
             words.scotsman(message);
         }
 
-        if(messageContent.substr(0,5) === 'learn'){
+        else if(messageContent.substr(0,5) === 'learn'){
             radio.learnSong(message);
         }
-        if(messageContent === 'start radio'){
+        else if(messageContent === 'start radio'){
             radio.startRadio(message,bot);
         }
-        if(messageContent === 'stop radio' || messageContent === 'stop screaming'){
+        else if(messageContent.startsWith('stop')){
             radio.stop(message,bot);
         }
-        if(messageContent === 'fuck matt'){
+        else if(messageContent === 'fuck matt'){
             fuckMatt=!fuckMatt;
         }
-        if(messageContent.includes('seig')) {
+        else if(messageContent.includes('seig')) {
         message.reply("HEIL");
         }
-        if(messageContent.includes('scream')){
+        else if(messageContent.includes('scream')){
+            console.log("message:" + messageContent);
             radio.scream(message,bot);
         }
-        if(messageContent === 'set swamp'){
+        else if(messageContent === 'set swamp'){
             radio.setSwamp(message,bot);
         }
-        if(messageContent === 'skip'){
+        else if(messageContent === 'skip'){
             radio.skip(message);
         }
-        if(messageContent.substr(0,3) === 'top'){
+        else if(messageContent.substr(0,3) === 'top'){
             radio.leaderboard(message);
         }
-        if(messageContent === ('tendie register')){
+        else if(messageContent === ('tendie register')){
             
             message.reply("Atempting to register you to tendies.net please wait...");
             tendies.initializePlayer(message);
         }
-        if(messageContent === ('tendies') || messageContent === ('tendos')){
+        else if(messageContent === ('tendies') || messageContent === ('tendos')){
             tendies.printTendies(message);
         }
-        if(messageContent === ('tendie mine')){
+        else if(messageContent === ('tendie mine')){
             tendies.mineTendies(message);
         }
-        if(messageContent.substr(0,4) === ('!rtd')){
+        else if(messageContent.substr(0,4) === ('!rtd')){
             message.reply("rolling a d" +message.content.substr(5,6) + "...");
             message.reply("I rolled a " + Math.floor(Math.random() * parseInt(message.content.substr(5,6)) + 1)); 
         }
-        if(messageContent.substr(0,7) === ('add game')){
+        else if(messageContent.substr(0,7) === ('add game')){
             fs.appendFile("\games.txt", message.content.substr(8,message.content.length) + "|", function(err) {
                 if(err) {
                     return console.log(err);
@@ -94,7 +95,7 @@ module.exports =
                 message.reply("added " + message.content.substr(8,message.content.length));
             });
         }
-        if(messageContent === ('pick game')){
+        else if(messageContent === ('pick game')){
             var games = fs.readFileSync('\games.txt', 'utf8');
             var gameArray = games.split("|");
             if(games.length >0){
