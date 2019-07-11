@@ -15,73 +15,78 @@ module.exports =
 {
     //main function handles a message
     messageHandle: async function (message,bot){
+        let messageContent = (message.content).toLowerCase();
+
         if(fuckMatt && message.author.id==='193186571615207424'){
             message.delete();
             message.reply("fuck you matt");
         }
-        if(message.content === 'what is my avatar'){
+        if(messageContent === 'what is my avatar'){
             //reply with users avatar
             message.reply(message.author.avatarURL);
         }
-        if(message.content.includes('hitler')){
+        if(messageContent.includes('hitler')){
             message.reply("Seig Heil");
         }
-        if(message.content.substr(0,4) === 'play'){
+        if(messageContent.substr(0,4) === 'play'){
             bot.user.setGame(message.content.substr(4,message.content.length));
         }
-        if(message.content.substr(0,6) === 'volume'){
+        if(messageContent.substr(0,6) === 'volume'){
             radio.volume(message);
         }
         //gw
-        if (message.content.startsWith('God says...')) {
+        if (messageContent.startsWith('god says...')) {
             words.godSays(message);
         }
         //scotsman insults
-        if(message.content.startsWith('scotsman'))
+        if(messageContent.startsWith('scotsman'))
         {
             words.scotsman(message);
         }
 
-        if(message.content.substr(0,5) === 'learn'){
+        if(messageContent.substr(0,5) === 'learn'){
             radio.learnSong(message);
         }
-        if(message.content === 'start radio'){
-            radio.startRadio(message);
+        if(messageContent === 'start radio'){
+            radio.startRadio(message,bot);
         }
-        if(message.content === 'stop radio' || message.content === 'stop screaming'){
-            radio.stop(message);
+        if(messageContent === 'stop radio' || messageContent === 'stop screaming'){
+            radio.stop(message,bot);
         }
-        if(message.content === 'fuck matt'){
+        if(messageContent === 'fuck matt'){
             fuckMatt=!fuckMatt;
         }
-        if(message.content.includes('seig') || message.content.includes('SEIG')) {
+        if(messageContent.includes('seig')) {
         message.reply("HEIL");
         }
-        if(message.content.includes('scream')){
-            radio.scream(bot);
+        if(messageContent.includes('scream')){
+            radio.scream(message,bot);
         }
-        if(message.content === 'skip'){
+        if(messageContent === 'set swamp'){
+            radio.setSwamp(message,bot);
+        }
+        if(messageContent === 'skip'){
             radio.skip(message);
         }
-        if(message.content.substr(0,3) === 'top'){
+        if(messageContent.substr(0,3) === 'top'){
             radio.leaderboard(message);
         }
-        if(message.content === ('tendieRegister')){
+        if(messageContent === ('tendie register')){
             
             message.reply("Atempting to register you to tendies.net please wait...");
             tendies.initializePlayer(message);
         }
-        if(message.content === ('tendies') || message.content === ('tendos')){
+        if(messageContent === ('tendies') || messageContent === ('tendos')){
             tendies.printTendies(message);
         }
-        if(message.content === ('tendieMine')){
+        if(messageContent === ('tendie mine')){
             tendies.mineTendies(message);
         }
-        if(message.content.substr(0,4) === ('!rtd')){
+        if(messageContent.substr(0,4) === ('!rtd')){
             message.reply("rolling a d" +message.content.substr(5,6) + "...");
             message.reply("I rolled a " + Math.floor(Math.random() * parseInt(message.content.substr(5,6)) + 1)); 
         }
-        if(message.content.substr(0,7) === ('addGame')){
+        if(messageContent.substr(0,7) === ('add game')){
             fs.appendFile("\games.txt", message.content.substr(8,message.content.length) + "|", function(err) {
                 if(err) {
                     return console.log(err);
@@ -89,7 +94,7 @@ module.exports =
                 message.reply("added " + message.content.substr(8,message.content.length));
             });
         }
-        if(message.content === ('pickGame')){
+        if(messageContent === ('pick game')){
             var games = fs.readFileSync('\games.txt', 'utf8');
             var gameArray = games.split("|");
             if(games.length >0){

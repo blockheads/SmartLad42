@@ -19,6 +19,13 @@ const EventEmitter = require('events');
 class MyEmitter extends EventEmitter {}
 const myEmitter = new MyEmitter();
 
+myEmitter.on('stop', () =>{
+    console.log("stopping stream");
+    radioHandler.donePlaying();
+    radioHandler.dispatcher.destroy();
+    connection.disconnect();
+});
+
 class User{
 
     constructor(username){
@@ -47,6 +54,10 @@ class RadioHandler{
         // this is to handle as we are selecting our song
         this.selecting = false;
         this.dispatcher = null;
+        // the current swamp
+        this.swamp = null;
+        //screaming?
+        this.screaming = false;
     }
 
     setSong(song){
@@ -73,6 +84,11 @@ class RadioHandler{
     end(){
         myEmitter.emit('end');
     }
+
+    stop(){
+        myEmitter.emit('stop');
+        this.screaming=false;
+    }
 }
 
 // our radio handler is built boiii
@@ -81,7 +97,7 @@ let radioHandler = new RadioHandler();
 //public functions
 module.exports = {
     //stops the current audio stream
-    stop: function(message){
+    stop: function(message,bot){
 
         if(!radioHandler.isPlaying()){
             return message.reply("I am not playing anything!");
@@ -94,8 +110,14 @@ module.exports = {
             return message.reply("You are not in a voice channel!");
         }
 
+        if(radioHandler.screaming){
+            radioHandler.stop();
+        }
+        else{
+            radioHandler.end();
+        }
         
-        radioHandler.end();
+        bot.user.setActivity('visit TendieNet');
        
         return undefined;
         
@@ -133,14 +155,20 @@ module.exports = {
     },
 
     scream : function (message,bot){
-        //delete this.
-        if(dispatcher){
-            //then just stop the audio
-            stop();
+        if(!radioHandler.swamp){
+            message.reply("You must set a swamp first.");
+            return;
         }
-        //now that refreashed start streaming the scream
-        streaming=true;
-        playAudioInSwamp(screams[Math.floor(Math.random()*screams.length)],1000000,bot);
+
+        if (radioHandler.isPlaying()){
+            radioHandler.end();
+        }
+        
+        song = screams[Math.floor(Math.random()*screams.length)];
+        radioHandler.setSong(new Song(song,null,null,null));
+        radioHandler.screaming = true;
+        playAudioInSwamp(song,1000000,bot);
+
     },
 
     learnSong : function (message) {
@@ -176,7 +204,7 @@ module.exports = {
     },
 
     //starts up the radio
-    startRadio: async function (message){
+    startRadio: async function (message,bot){
         
         if(streaming){
             return message.reply("I'm already playing something!");
@@ -195,7 +223,7 @@ module.exports = {
             console.error("could not join the voice channel, error: ${error} ");
             return message.channel.send("I could not join the voice channel, error: {$error}");
         }    
-        audioStream( message, connection );
+        audioStream( message, connection, bot );
 
         myEmitter.on('skip', () =>{
             console.log("skipping song");
@@ -248,22 +276,25 @@ module.exports = {
         }
         
     },
+    setSwamp: function(message,bot){
+        const voiceChannel = message.member.voiceChannel;
+        if(!voiceChannel){
+            return message.reply("error, not in voice channel, please join a swamp to set.");
+        }
+        message.reply('swamp set to ' + voiceChannel.name);
+        radioHandler.swamp = voiceChannel;
+    },
     playSpecificSong(song,volume,bot){
         //delete this.
         //delete this.
-        if(dispatcher){
+        if(radioHandler.isPlaying()){
             //stop streaming
-            streaming=false;
-            dispatcher.end();
-            dispatcher = null;
-            voiceChannel = null;
-            if(connection){
-                connection = null;
-            }
+            radioHandler.end();
         }
         
         playAudioInSwamp(song,volume,bot);
-    }
+    },
+    // 
 
 };
 
@@ -272,29 +303,28 @@ module.exports = {
 
 //singularly play audio on end of audio stream leave channel (defaults to swamp)
 function playAudioInSwamp( song,volume,bot ){
-    if(streaming){
-        voiceChannel = bot.channels.get(tokens.getToken2());
-        if (!voiceChannel) {
-            console.log("null VoiceChannel");
-        }
-        voiceChannel.join()
-            .then(connnection => {
-            let stream = yt(song, {audioonly: true});
-            dispatcher = connnection.playStream(stream);
-            dispatcher.setVolume(volume);
-            dispatcher.on('end', () => {
-                if(voiceChannel){
-                    streaming = false;
-                    voiceChannel.leave();
-                }
-            });
+
+    
+  
+    voiceChannel = radioHandler.swamp;
+    voiceChannel.join()
+        .then(connnection => {
+        let stream = yt(song, {audioonly: true});
+        dispatcher = connnection.playStream(stream);
+        radioHandler.dispatcher = dispatcher;
+        dispatcher.setVolume(volume);
+        dispatcher.on('end', () => {
+            if(voiceChannel){
+                voiceChannel.leave();
+            }
         });
-    }
+    });
+    
     
 }
 
 //continually stream audio
-async function audioStream(message,connection){
+async function audioStream(message,connection,bot){
     //we are now streaming audio!
 
     // selecting a song
@@ -353,13 +383,24 @@ async function audioStream(message,connection){
     let song = new Song(songname,songData[1],new User(username),timeString);
     radioHandler.setSong(song);
 
+    yt.getBasicInfo(songname,(err,info)=>{
+        if(err){
+            console.log(err);
+        
+        }
+        else{
+            console.log(info.title);
+            bot.user.setActivity(info.title);
+        }
+    });
+
     //setting the dispatcher to play the stream
     const dispatcher = await connection.playStream(yt(songname,{filter: "audioonly"}))
         .on('end', () => {
             if (radioHandler.isPlaying()){
                 console.log("The song has ended.");
                 radioHandler.song.playing = false;
-                audioStream(message,connection);
+                audioStream(message,connection,bot);
             }
             
         }
