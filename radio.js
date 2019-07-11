@@ -14,12 +14,76 @@ const tokens = require('./tokens.js');
 
 const sqlite3 = require('sqlite3').verbose();
 
+const EventEmitter = require('events');
+
+class MyEmitter extends EventEmitter {}
+const myEmitter = new MyEmitter();
+
+class User{
+
+    constructor(username){
+        this.username = username;
+    }
+
+}
+
+class Song{
+
+    constructor(name,plays,user,time){
+        this.name = name;
+        this.plays = plays;
+        this.user = user;
+        this.time = time;
+        this.playing = false;
+    }
+
+
+}
+
+class RadioHandler{
+
+    constructor(){
+        this.currentSong = null;
+        // this is to handle as we are selecting our song
+        this.selecting = false;
+        this.dispatcher = null;
+    }
+
+    setSong(song){
+        this.currentSong = song;
+    }
+
+    donePlaying(){
+        this.currentSong.playing = false;
+        this.currentSong = null;
+    }
+
+    isPlaying(){
+        return this.currentSong != null || this.selecting;
+    }
+
+    get song(){
+        return this.currentSong;
+    }
+
+    skip(){
+        myEmitter.emit('skip');
+    }
+
+    end(){
+        myEmitter.emit('end');
+    }
+}
+
+// our radio handler is built boiii
+let radioHandler = new RadioHandler();
+
 //public functions
 module.exports = {
     //stops the current audio stream
     stop: function(message){
 
-        if(!streaming){
+        if(!radioHandler.isPlaying()){
             return message.reply("I am not playing anything!");
         }
 
@@ -30,9 +94,9 @@ module.exports = {
             return message.reply("You are not in a voice channel!");
         }
 
-        streaming = false;
-
-        message.member.voiceChannel.leave();
+        
+        radioHandler.end();
+       
         return undefined;
         
     },
@@ -53,19 +117,18 @@ module.exports = {
     //skips the current song
     skip: function (message){
         
-        message.reply("skip under matienence.");
-        // if(!streaming){
-        //     return message.reply("I am not playing anything!");
-        // }
+        if(!radioHandler.isPlaying()){
+            return message.reply("I am not playing anything!");
+        }
 
-        // console.log("skip function executing...");
+        console.log("skip function executing...");
 
-        // //stop streaming
-        // if( !message.member.voiceChannel ){
-        //     return message.reply("You are not in a voice channel!");
-        // }
+        //stop streaming
+        if( !message.member.voiceChannel ){
+            return message.reply("You are not in a voice channel!");
+        }
 
-        // streaming = false;
+        radioHandler.skip();
 
     },
 
@@ -110,7 +173,6 @@ module.exports = {
         // close the database connection
         db.close();
 
-
     },
 
     //starts up the radio
@@ -133,7 +195,21 @@ module.exports = {
             console.error("could not join the voice channel, error: ${error} ");
             return message.channel.send("I could not join the voice channel, error: {$error}");
         }    
-        return audioStream( message, connection );
+        audioStream( message, connection );
+
+        myEmitter.on('skip', () =>{
+            console.log("skipping song");
+            radioHandler.dispatcher.destroy();
+            radioHandler.song.playing = false;
+        });
+    
+        myEmitter.on('end', () =>{
+            console.log("stopping Radio");
+            radioHandler.donePlaying();
+            radioHandler.dispatcher.destroy();
+            connection.disconnect();
+            message.reply("Radio shutting down, thank you for listening! :).")
+        });
     },
 
     //gets top songs
@@ -219,17 +295,26 @@ function playAudioInSwamp( song,volume,bot ){
 
 //continually stream audio
 async function audioStream(message,connection){
-    
+    //we are now streaming audio!
+
+    // selecting a song
+    radioHandler.selecting = true;
+
+
+    console.log(radioHandler.song)
+
     //grabing the volume and song
     try{
         songData = await getSong(message);
+        radioHandler.selecting = false;
+
         console.log(songData);
         // scenario where there is no song....
         if(!songData){
             console.log("Recieved no songData");
             try{
                 if(voiceChannel){
-                    streaming = false;
+                    radioHandler.donePlaying();
                     voiceChannel.leave();
                 }
                 
@@ -250,10 +335,6 @@ async function audioStream(message,connection){
     var songname = songData[0];
     await console.log(`retrieved  from function call: ${songname}`);
 
-
-    //we are now streaming audio!
-    streaming = true;
-
     
     if(!songData[2])
         username = "UNKNOWN TENDIENET RESIDENT";
@@ -268,21 +349,24 @@ async function audioStream(message,connection){
     }
 
     message.reply("Selected  " + songname + " Which has been played " + songData[1] + " Stored by " + username + " at " + timeString);
+    
+    let song = new Song(songname,songData[1],new User(username),timeString);
+    radioHandler.setSong(song);
 
     //setting the dispatcher to play the stream
     const dispatcher = await connection.playStream(yt(songname,{filter: "audioonly"}))
         .on('end', () => {
-            
-            console.log("The song has ended.");
-            //check if we are still playing audio
-            if(streaming){
+            if (radioHandler.isPlaying()){
+                console.log("The song has ended.");
+                radioHandler.song.playing = false;
                 audioStream(message,connection);
             }
-            else{
-                connection.disconnect();
-            }
+            
+        }
         
-    });
+    );
+    
+    radioHandler.dispatcher = dispatcher;
 
     //choosing the volume
     dispatcher.setVolume(volumeScale(songData[1]));
@@ -330,6 +414,7 @@ async function getSong(message){
 
     });
 }
+
 
 
 //compares the song array
