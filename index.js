@@ -21,7 +21,27 @@ bot.on('ready', () =>{
     // building our database tables
     // opening up our SMART database, very smart new tech
     let db = new sqlite3.Database('smartDatabase.db');
+   
     db.run('CREATE TABLE IF NOT EXISTS songs(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, plays INTEGER, user TEXT, time TEXT)');
+    
+    //db.run('DROP TABLE songs');	
+
+    /** 
+    db.all('SELECT * FROM songs2',[],(err,rows) =>{
+        if(err){
+	    throw err;
+	}
+	rows.forEach((row) =>{
+	    db.run('INSERT INTO songs(id,name,plays,user,time) VALUES(?,?,?,?,?)',[row.id,row.name,row.plays,null,null],function(err){
+		if(err){
+			return console.log(err.message);
+		}
+	    });
+	   
+	});
+    });
+    **/
+
     db.close();
     console.log('ready!');
 });
