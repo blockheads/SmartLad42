@@ -3,7 +3,24 @@ var busy = false;
 var id;
 var tendies;
 
+// avast yet what is a tendie user?
+
+
 module.exports = {
+    TendieUser :class {
+
+        constructor(user){
+            this.buildUser(user);
+        }
+    
+        buildUser(user){
+            this.id = user.id;
+            this.username = user.username;
+            this.createdTime = Date.now();
+            this.avatar = user.avatar;
+            this.ownedSongs = [];
+        }
+    },
 
     tendieUser : function(id,tendies){
         //intializing tendies/id values
@@ -33,7 +50,8 @@ module.exports = {
                 return tendies;
             }
         }
-    }
+    },
+    
     
 }
 

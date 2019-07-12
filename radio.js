@@ -97,7 +97,7 @@ class RadioHandler{
 
     // when a audiostream is finished playing
     finished(message,bot){
-        console.log("next song");
+        console.log("On End called.");
         this.dispatcher.destroy();
         if (this.isPlaying()){
             this.song.playing = false;
@@ -338,11 +338,16 @@ async function audioStream(message,bot){
     console.log(radioHandler.song)
 
     //grabing the volume and song
+    
     try{
-        songData = await getSong(message);
+        var songData = await getSong(message);
+    }
+    catch(error){
+        return console.log(error);
+    }
+    finally{
         radioHandler.selecting = false;
 
-        console.log(songData);
         // scenario where there is no song....
         if(!songData){
             console.log("Recieved no songData");
@@ -360,54 +365,56 @@ async function audioStream(message,bot){
                 return;
             }
         }
-    }
-    catch (error){
-        console.error("could not get song, error: ",error);
-        return;
-    }
-    
-    var songname = songData[0];
-    await console.log(`retrieved  from function call: ${songname}`);
-
-    
-    if(!songData[2])
-        username = "UNKNOWN TENDIENET RESIDENT";
-    else{
-        username = songData[2]
-    }
-    if(!songData[3]){
-        timeString = "UNKNOWN TIME";
-    }
-    else{
-        timeString = JSON.parse(songData[3])
-    }
-
-    message.reply("Selected  " + songname + " Which has been played " + songData[1] + " Stored by " + username + " at " + timeString);
-    
-    let song = new Song(songname,songData[1],new User(username),timeString);
-    radioHandler.setSong(song);
-
-    yt.getBasicInfo(songname,(err,info)=>{
-        if(err){
-            console.log(err);
-        
-        }
         else{
-            console.log(info.title);
-            bot.user.setActivity(info.title);
+            var songname = songData[0];
+            await console.log(`retrieved  from function call: ${songname}`);
+        
+            
+            if(!songData[2])
+                username = "UNKNOWN TENDIENET RESIDENT";
+            else{
+                username = songData[2]
+            }
+            if(!songData[3]){
+                timeString = "UNKNOWN TIME";
+            }
+            else{
+                timeString = JSON.parse(songData[3])
+            }
+        
+            message.reply("Selected  " + songname + " Which has been played " + songData[1] + " Stored by " + username + " at " + timeString);
+            
+            let song = new Song(songname,songData[1],new User(username),timeString);
+            radioHandler.setSong(song);
+        
+            yt.getBasicInfo(songname,(err,info)=>{
+                if(err){
+                    console.log(err);
+                
+                }
+                else{
+                    console.log(info.title);
+                    bot.user.setActivity(info.title);
+                }
+            });
+        
+            //setting the dispatcher to play the stream
+            const dispatcher = await radioHandler.connection.playStream(yt(songname,{filter: "audioonly"}))
+                .on('end', () => {
+                    radioHandler.finished(message,bot);
+                });
+            
+            radioHandler.dispatcher = dispatcher;
+        
+            //choosing the volume
+            dispatcher.setVolume(volumeScale(songData[1]));
         }
-    });
-
-    //setting the dispatcher to play the stream
-    const dispatcher = await radioHandler.connection.playStream(yt(songname,{filter: "audioonly"}))
-        .on('end', () => {
-            radioHandler.finished(message,bot);
-        });
+    }
     
-    radioHandler.dispatcher = dispatcher;
+   
+  
+   
 
-    //choosing the volume
-    dispatcher.setVolume(volumeScale(songData[1]));
 
 }
 
@@ -427,27 +434,29 @@ async function getSong(message){
                 reject(console.error(err.message));
             }
 
-            if(!row){
-                message.reply("No songs stored yet, add a song with 'learn <youtubeLink>'");
+            else if(!row){
+                message.reply("No song's avaible add a song to the TendieNet™ with 'learn <youtubeURL>'.")
                 reject("No songs stored yet, add a song to the tendieNet with 'learn <youtubeLink>'");
             }    
-            
-            console.log(row);
-            songData = [row.name,row.plays,row.user,row.time];
-            
-            // we need to update that row, hence why we keep a primary key, got to stay FAST
-            let sql = 'UPDATE songs SET plays = ? WHERE id = ?';
-            db.get(sql,[row.plays+1,row.id],(err,updateRow) =>{
-                // if we error out it's cool, all we are doing is updating the song play count anyways...
-                if (err){
-                    console.error(err.message);
-                }
-            });
-            
+            else{
+                console.log(row);
+                songData = [row.name,row.plays,row.user,row.time];
+                
+                // we need to update that row, hence why we keep a primary key, got to stay FAST
+                let sql = 'UPDATE songs SET plays = ? WHERE id = ?';
+                db.get(sql,[row.plays+1,row.id],(err,updateRow) =>{
+                    // if we error out it's cool, all we are doing is updating the song play count anyways...
+                    if (err){
+                        console.error(err.message);
+                    }
+                });
+                
 
-            db.close();
-            console.log(songData);
-            resolve(songData);
+                db.close();
+                console.log(songData);
+                resolve(songData);
+            }
+            
         });
 
     });

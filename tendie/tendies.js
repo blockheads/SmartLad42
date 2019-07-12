@@ -3,6 +3,8 @@ const fs = require('fs');
 //for tendie actions
 const user = require('./tendieUser.js');
 
+const sqlite3 = require('sqlite3').verbose();
+
 //stores guildMembers and tendies
 var tendieMap = new Map();
 //now calling updateMap to initialze the tendies
@@ -20,29 +22,73 @@ module.exports = {
         }
     },
     //initializes the player in users.txt
-    initializePlayer : function(message){
-    
-        if(!isInitialized(message.member)){
+    initializePlayer : async function(message){
+        res = false;
+        try{
+            res = await this.getUser(message.author.id);
+        }
+        catch(error){
+            return console.log("Failed to register!");
+        }
+        finally{
+            if(!res){
             
-            //stores username|#tendies
-            fs.appendFile("./tendie/tendiebox.txt", message.member.id + "|0|", function(err) {
-                if(err) {
-                    return console.log(err);
-                }
-                message.reply("new user registered to tendies.net!");
-                //updating the tendieMap
-                updateMap();
-            });
-
-        }
-        else{
-            message.reply("you are already registered to tendies.net");
-        }
+                let db = new sqlite3.Database('smartDatabase.db');
+            
+                //storing our jsons
+                tendieUser = new user.TendieUser(message.author);
+                
+                // insert one row into the langs table
+                db.run(`INSERT INTO tendieNet(id, tendieUser) VALUES(?,?)`, [message.author.id,JSON.stringify(tendieUser)], function(err) {
+                    if (err) {
+                        console.log(err.message);
+                        message.reply("Failed to register you to the TendieNet™ please ask your TendieNet™ admin about this error.");
+                        return -1;
+                    }
+                    // get the last insert id
+                    console.log(`sucesfully added user has been inserted with rowid ${this.lastID}`);
+                    message.reply("Thank you user " + message.author.username + " your private data is now uploaded to the TendieNet™");
+                });
+                
+                // close the database connection
+                db.close();
+    
+            }
+            else{
+                message.reply("you are already registered to the TendieNet™!");
+            }
+        } 
     },
     mineTendies : function(message){
         //initializes mining
-        tendieMap.get(message.member.id).beginMine(message);
+        tendieMap.get(message.author.id).beginMine(message);
         
+    },
+    getUser : function(id){
+
+        return new Promise(function(resolve,reject){
+        
+            let sql = 'SELECT * FROM tendieNet WHERE id = ?'
+            // open the database
+            let db = new sqlite3.Database('smartDatabase.db');
+
+            db.get(sql,[id],(err,row) => {
+                if (err){
+                    reject(console.error(err.message));
+                }
+                else if(!row){
+                    reject(console.log("No user registered on tendie database with that user id."));
+                }
+                else{
+                    console.log(row);
+                    resolve(JSON.parse(row.tendieUser));
+                }
+                db.close();
+                
+            });
+
+        });
+
     },
     update : function(){
         updateFile();

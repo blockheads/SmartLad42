@@ -23,6 +23,11 @@ bot.on('ready', () =>{
     let db = new sqlite3.Database('smartDatabase.db');
    
     db.run('CREATE TABLE IF NOT EXISTS songs(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, plays INTEGER, user TEXT, time TEXT)');
+
+    // table for the tendieNet
+    db.run('CREATE TABLE IF NOT EXISTS tendieNet(id INTEGER PRIMARY KEY, tendieUser TEXT)');
+
+    console.log("TendieNet online.")
     
     //db.run('DROP TABLE songs');	
 
