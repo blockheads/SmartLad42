@@ -19,23 +19,15 @@ const EventEmitter = require('events');
 class MyEmitter extends EventEmitter {}
 const myEmitter = new MyEmitter();
 
-myEmitter.on('stop', ()=>{
-    console.log("stopping stream");
-    radioHandler.donePlaying();
-    radioHandler.dispatcher.destroy();
-    if(radioHandler.connection){
-        radioHandler.connection.disconnect();
-    }
-});
 
-myEmitter.on('skip',  ()=>{
-    console.log("skipping song");
+myEmitter.on('end',  (message,bot)=>{
+    console.log("next song");
     radioHandler.dispatcher.destroy();
     radioHandler.song.playing = false;
 });
 
-myEmitter.on('end',  ()=>{
-    console.log("stopping Radio");
+myEmitter.on('stop',  ()=>{
+    console.log("stopping audio");
     radioHandler.donePlaying();
     radioHandler.dispatcher.destroy();
     radioHandler.connection.disconnect();
@@ -95,16 +87,25 @@ class RadioHandler{
         return this.currentSong;
     }
 
-    skip(){
-        myEmitter.emit('skip');
-    }
-
-    end(){
-        myEmitter.emit('end');
+    end(message,bot){
+        myEmitter.emit('end',message,bot);
     }
 
     stop(){
         myEmitter.emit('stop');
+    }
+
+    // when a audiostream is finished playing
+    finished(message,bot){
+        console.log("next song");
+        this.dispatcher.destroy();
+        if (this.isPlaying()){
+            this.song.playing = false;
+            audioStream(message,bot);
+        }
+        else{
+
+        }
     }
 }
 
@@ -127,10 +128,10 @@ module.exports = {
             return message.reply("You are not in a voice channel!");
         }
 
-        message.reply("Stoping audioStream.")
-        radioHandler.end();
+        message.reply("Done playing audio!");
+        radioHandler.stop();
         
-        bot.user.setActivity('visit TendieNet');
+        bot.user.setActivity('visit TendieNet™');
        
         return undefined;
         
@@ -150,10 +151,14 @@ module.exports = {
     },
 
     //skips the current song
-    skip: function (message){
+    skip: function (message,bot){
         
         if(!radioHandler.isPlaying()){
             return message.reply("I am not playing anything!");
+        }
+
+        if(radioHandler.screaming){
+            return message.reply("YOU CAN'T' SKIP A SCREAM");
         }
 
         console.log("skip function executing...");
@@ -163,7 +168,7 @@ module.exports = {
             return message.reply("You are not in a voice channel!");
         }
 
-        radioHandler.skip();
+        radioHandler.end(message,bot);
 
     },
 
@@ -175,7 +180,7 @@ module.exports = {
         }
 
         if (radioHandler.isPlaying()){
-            radioHandler.end();
+            radioHandler.stop();
         }
         
         song = screams[Math.floor(Math.random()*screams.length)];
@@ -220,7 +225,7 @@ module.exports = {
     //starts up the radio
     startRadio: async function (message,bot){
         
-        if(streaming){
+        if(radioHandler.isPlaying()){
             return message.reply("I'm already playing something!");
         }
 
@@ -396,12 +401,7 @@ async function audioStream(message,bot){
     //setting the dispatcher to play the stream
     const dispatcher = await radioHandler.connection.playStream(yt(songname,{filter: "audioonly"}))
         .on('end', () => {
-            if (radioHandler.isPlaying()){
-                console.log("The song has ended.");
-                radioHandler.song.playing = false;
-                audioStream(message,bot);
-        }
-        
+            radioHandler.finished(message,bot);
         });
     
     radioHandler.dispatcher = dispatcher;

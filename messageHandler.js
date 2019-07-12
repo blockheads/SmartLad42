@@ -9,7 +9,6 @@ const fs = require('fs');
 
 var fuckMatt = false;
 
-
 //module.exports = "public" functions...
 module.exports = 
 {
@@ -67,7 +66,7 @@ module.exports =
             radio.setSwamp(message,bot);
         }
         else if(messageContent === 'skip'){
-            radio.skip(message);
+            radio.skip(message,bot);
         }
         else if(messageContent.substr(0,3) === 'top'){
             radio.leaderboard(message);
