@@ -473,6 +473,6 @@ function songCompare(a,b){
 
 //volume scaling, very important stuff
 function volumeScale(volume){
-    return  Math.abs( Math.cos(volume*10)*Math.pow(1.3,volume)*1/10);
+    return  Math.abs( Math.cos(volume*10)*Math.pow(1.1,volume)*1/10);
 }
 
