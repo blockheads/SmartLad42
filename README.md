@@ -14,3 +14,5 @@ who have access to the bot
 - Mute Matt, Mute's Matt from any given server SmartLad has access to
 
 And many more secret features....
+
+:heart:
