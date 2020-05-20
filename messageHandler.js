@@ -11,7 +11,6 @@ var fuckMatt = false;
 
 // tendie commands
 COMMANDS = {'what is my avatar' : tendieCommand,
-            'hitler'            : tendieCommand,
             'play'              : tendieCommand,
             'volume'            : tendieCommand,
             'god says...'       : tendieCommand,
@@ -19,7 +18,7 @@ COMMANDS = {'what is my avatar' : tendieCommand,
             'learn'             : tendieCommand,
             'start radio'       : tendieCommand,
             'stop'              : tendieCommand,
-            'fuck matt'         : tendieCommand,
+            'matt'              : tendieCommand,
             'seig'              : tendieCommand, 
             'scream'            : tendieCommand,
             'set swamp'         : tendieCommand,
@@ -40,9 +39,9 @@ module.exports =
         let messageContent = (message.content).toLowerCase();
 
         // specific methods to handle
-        if(fuckMatt && message.author.id==='193186571615207424'){
+        if(Matt && message.author.id==='193186571615207424'){
             message.delete();
-            message.reply("fuck you matt");
+            message.reply("Bad matt.");
         }
 
         for(var key in COMMANDS){
@@ -89,9 +88,6 @@ async function tendieCommand(message,bot){
                 //reply with users avatar
                 message.reply(message.author.avatarURL);
             }
-            else if(messageContent.includes('hitler')){
-                message.reply("Seig Heil");
-            }
             else if(messageContent.substr(0,4) === 'play'){
                 bot.user.setGame(message.content.substr(4,message.content.length));
             }
@@ -117,11 +113,8 @@ async function tendieCommand(message,bot){
             else if(messageContent.startsWith('stop')){
                 radio.stop(message,bot);
             }
-            else if(messageContent === 'fuck matt'){
-                fuckMatt=!fuckMatt;
-            }
-            else if(messageContent.includes('seig')) {
-                message.reply("HEIL");
+            else if(messageContent === 'matt'){
+                Matt=!Matt;
             }
             else if(messageContent.includes('scream')){
                 console.log("message:" + messageContent);

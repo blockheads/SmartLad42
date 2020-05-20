@@ -1,11 +1,10 @@
 
 var words = ["Blood Money","Benji","Funny Money","Yard ","Pots of Money",
              "Brass","Scrilla","Scrappa","Dibs","Handbag","Measures",
-             "Bag of Sand","ROBLOX","911 was an inside job","smoke weed",
-             "Matt is CIA","the Third Temple is coming","Flag","Handful",
+             "Bag of Sand","ROBLOX", "the Third Temple is coming","Flag","Handful",
              "Mill","Sheckles","Ton","Stack","Brick","Dough","Bread",
              "Good Cash","C-Note","Feddie","Cod","Course Note","High Rollin",
-             "Yayo","Rack","kilo","mula","Fuck-Fuck","nigga","big weed",
+             "Yayo","Rack","kilo","mula","big weed",
              "Big Watch","Big Booty","Shaboobalaboopy","Stiplificate",
              "Apologin","Bling Bling","Mamajahambo","dinosaurs",
              "movie movie movie","Captian Alexe","Herb","Buster",
@@ -21,7 +20,7 @@ var words = ["Blood Money","Benji","Funny Money","Yard ","Pots of Money",
              "The","man","is","insane","he","thinks","he","is","me","but","he",
              "doesn't","look","like","me","or","talk","like","me","he","is",
              "a","duckman","rururururu","clown","heckin'","ratboy genius","mime",
-             "Zain","Giga Nigga"];
+             "Zain"];
 
 var scotsman = ["Mr.","pajama-wearin'","basket-face","slipper-wieldin'",
                 "clype-dreep-bachle","gether-uping-blate-maw","bleathering gomeril",
