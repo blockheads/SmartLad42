@@ -11,10 +11,13 @@
   "dependencies": {
     "discord.js": "^11.4.2",
     "ffmpeg": "0.0.4",
+    "m3u8stream": "^0.8.6",
+    "node-fetch": "^2.7.0",
     "opusscript": "0.0.3",
-    "sqlite": "^3.0.3",
-    "ytdl": "^0.5.1",
-    "ytdl-core": "^0.29.3"
+    "sqlite": "^5.1.1",
+    "sqlite3": "^5.1.7",
+    "ytdl": "^1.4.1",
+    "ytdl-core": "^4.11.5"
   },
   "devDependencies": {
     "eslint": "^6.0.1",

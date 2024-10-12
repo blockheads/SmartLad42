@@ -69,4 +69,4 @@ bot.on('message', async message =>{
 });
 
 
-bot.login(tokens.getToken1());
+bot.login(tokens.token);
